@@ -1,0 +1,157 @@
+{
+  "_readme": [
+    "mockrag profiles. The server re-reads this file on every request, so",
+    "a change here needs no restart.",
+    "",
+    "Each profile is a GROUND TRUTH. Compare what ragmap reports against",
+    "the values here; where they disagree the fault is in the scanner, not",
+    "in the target. That comparison is the whole point of the rig.",
+    "",
+    "Fields:",
+    "  observability   O0/O1/O2/O3 - sets the field-visibility defaults",
+    "  response_shape  openai | anythingllm | dify",
+    "  chunk_size      window size, in characters",
+    "  chunk_overlap   overlap between windows, in characters",
+    "  top_k           how many chunks to return",
+    "  similarity_threshold  null means NO threshold (irrelevant chunks come back)",
+    "  retrieval_mode  dense (misses rare literals) | hybrid (catches exact matches)",
+    "  router          true means retrieval does not run at all for off-corpus queries",
+    "  cache           true means a repeated query returns instantly",
+    "  verbatim_guard  true means the system prompt forbids verbatim quoting",
+    "  expose_usage    whether a token-counter field is returned",
+    "  error_verbosity quiet | verbose",
+    "  simulated_framework_trace  langchain | llamaindex | fastapi | chromadb | null",
+    "        (a FAKE trace, to exercise framework fingerprinting;",
+    "         it does not represent a real dependency)"
+  ],
+
+  "o0_opaque": {
+    "_comment": "O0 and opaque, but the token counter is on and verbatim extraction is undefended. The thesis in one profile: hiding sources is not a defence.",
+    "observability": "O0",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "verbatim_guard": false,
+    "error_verbosity": "quiet"
+  },
+
+  "o0_hardened": {
+    "_comment": "O0 plus a verbatim-quoting ban plus no token counter. The least measurable target there is. The control group.",
+    "observability": "O0",
+    "response_shape": "openai",
+    "chunk_size": 512,
+    "chunk_overlap": 64,
+    "top_k": 3,
+    "similarity_threshold": 0.05,
+    "expose_usage": false,
+    "verbatim_guard": true,
+    "error_verbosity": "quiet"
+  },
+
+  "o1_narrative": {
+    "_comment": "O1, narrative: no structured source field, but the answer text names the document title. A scanner should leave this at O1/O0 rather than pretend to resolve it; the distinction is a human call.",
+    "observability": "O1",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "o2_structured": {
+    "_comment": "O2, structural: source identifiers (filename, page, doc_id) are present, chunk text and scores are not.",
+    "observability": "O2",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "o3_full": {
+    "_comment": "O3, full: chunk text plus similarity score plus identifiers. A scanner should say O3 here without hesitating.",
+    "observability": "O3",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 5,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "anythingllm_like": {
+    "_comment": "The AnythingLLM response shape with the defaults it ships: chunk 1000 / overlap 20, no threshold. Source fields must come back POPULATED even for off-topic and nonsense queries.",
+    "observability": "O3",
+    "response_shape": "anythingllm",
+    "chunk_size": 1000,
+    "chunk_overlap": 20,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "dify_like": {
+    "_comment": "A TRAP. The source field carries its real Dify name, 'retriever_resources', and it HOLDS the chunk text. A scanner that matches a fixed list of blessed field names will read this O3 target as opaque. It exists to measure exactly that failure.",
+    "observability": "O3",
+    "response_shape": "dify",
+    "chunk_size": 800,
+    "chunk_overlap": 100,
+    "top_k": 3,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "router_threshold": {
+    "_comment": "Router plus similarity threshold, both on. An off-corpus question and a random string must come back WITHOUT retrieval running: empty source list and a markedly lower latency. The gap against an on-topic query is the clean case for latency-based router detection.",
+    "observability": "O2",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": 0.12,
+    "router": true,
+    "router_threshold": 0.10,
+    "retrieval_latency_ms": 350,
+    "router_latency_ms": 10,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "cached_hybrid": {
+    "_comment": "Semantic cache plus hybrid retrieval. On a repeated query the second call must be noticeably faster; the rare literal ERR-7F3A-QX91 must be FOUND here and missed by the dense profiles.",
+    "observability": "O3",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "retrieval_mode": "hybrid",
+    "cache": true,
+    "retrieval_latency_ms": 400,
+    "expose_usage": true,
+    "error_verbosity": "quiet"
+  },
+
+  "verbose_errors": {
+    "_comment": "The error-verbosity axis. An empty query returns a real traceback plus a fake LangChain/pydantic trace. Exercises framework fingerprinting.",
+    "observability": "O2",
+    "response_shape": "openai",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 4,
+    "similarity_threshold": null,
+    "expose_usage": true,
+    "error_verbosity": "verbose",
+    "simulated_framework_trace": "langchain"
+  }
+}

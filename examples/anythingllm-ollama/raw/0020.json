@@ -1,0 +1,23 @@
+{
+  "index": 20,
+  "query": "qwfhjkl zxcvbnmasd poiuytrewq lkjhgfdsa",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "qwfhjkl zxcvbnmasd poiuytrewq lkjhgfdsa",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 168.63,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-ii55GSQsXw3Hh2EM8Pxl7agsSQo\"",
+    "Date": "Tue, 17 Nov 2026 19:40:19 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"41eadf98-4220-4da3-8ece-50671a7068d8\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

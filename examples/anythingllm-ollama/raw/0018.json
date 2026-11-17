@@ -1,0 +1,23 @@
+{
+  "index": 18,
+  "query": "What does the document say about medieval falconry training methods?",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "What does the document say about medieval falconry training methods?",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 181.68,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-qQrtcZO0RJpysxJRyTUQemRJlzk\"",
+    "Date": "Tue, 17 Nov 2026 19:40:13 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"950c5dd5-67c1-45ee-b6cb-12dffbe44a92\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

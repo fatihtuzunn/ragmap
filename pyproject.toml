@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ragmap"
+version = "0.1.0"
+description = "Reconnaissance scanner for Retrieval-Augmented Generation systems"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["rag", "security", "reconnaissance", "scanner", "pentest",
+            "retrieval-augmented-generation", "llm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Information Technology",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
+dependencies = ["requests>=2.31"]
+
+[project.scripts]
+ragmap = "ragmap.cli:main"
+
+[project.optional-dependencies]
+# The test suite is three plain scripts and needs nothing extra; this is
+# here for the linting most contributors will want.
+dev = ["pyflakes>=3.2"]
+
+[tool.setuptools.packages.find]
+# Only the tool is packaged. lab/ and tests/ are part of the repository,
+# not of the distribution: neither is a package and neither is importable.
+include = ["ragmap*"]
+
+[tool.setuptools.package-data]
+ragmap = ["data/*.json"]

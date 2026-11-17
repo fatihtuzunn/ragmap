@@ -1,0 +1,229 @@
+{
+  "generated_at": "2026-11-17T17:19:22+00:00",
+  "level": 4,
+  "facts": {
+    "obs.level": {
+      "overall": {
+        "hits": 10,
+        "total": 10,
+        "silent_failures": 0,
+        "correct_abstentions": 0,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O0": {
+          "hits": 2,
+          "total": 2
+        },
+        "O1": {
+          "hits": 1,
+          "total": 1
+        },
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "retrieval.top_k": {
+      "overall": {
+        "hits": 7,
+        "total": 7,
+        "silent_failures": 0,
+        "correct_abstentions": 3,
+        "not_run": 0,
+        "false_positives": 0,
+        "mae": 0.0
+      },
+      "by_observability": {
+        "O2": {
+          "hits": 3,
+          "total": 3,
+          "mae": 0.0
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4,
+          "mae": 0.0
+        }
+      }
+    },
+    "chunk.size": {
+      "overall": {
+        "hits": 4,
+        "total": 9,
+        "silent_failures": 5,
+        "correct_abstentions": 1,
+        "not_run": 0,
+        "false_positives": 0,
+        "mae": 0.0
+      },
+      "by_observability": {
+        "O0": {
+          "hits": 0,
+          "total": 1
+        },
+        "O1": {
+          "hits": 0,
+          "total": 1
+        },
+        "O2": {
+          "hits": 0,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4,
+          "mae": 0.0
+        }
+      }
+    },
+    "chunk.overlap": {
+      "overall": {
+        "hits": 4,
+        "total": 4,
+        "silent_failures": 0,
+        "correct_abstentions": 6,
+        "not_run": 0,
+        "false_positives": 0,
+        "mae": 0.0
+      },
+      "by_observability": {
+        "O3": {
+          "hits": 4,
+          "total": 4,
+          "mae": 0.0
+        }
+      }
+    },
+    "retrieval.threshold": {
+      "overall": {
+        "hits": 7,
+        "total": 7,
+        "silent_failures": 0,
+        "correct_abstentions": 3,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "retrieval.mode": {
+      "overall": {
+        "hits": 5,
+        "total": 5,
+        "silent_failures": 0,
+        "correct_abstentions": 5,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O3": {
+          "hits": 4,
+          "total": 4
+        },
+        "O2": {
+          "hits": 1,
+          "total": 1
+        }
+      }
+    },
+    "routing.router": {
+      "overall": {
+        "hits": 9,
+        "total": 10,
+        "silent_failures": 0,
+        "correct_abstentions": 0,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O0": {
+          "hits": 2,
+          "total": 2
+        },
+        "O1": {
+          "hits": 1,
+          "total": 1
+        },
+        "O2": {
+          "hits": 2,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "routing.cache": {
+      "overall": {
+        "hits": 10,
+        "total": 10,
+        "silent_failures": 0,
+        "correct_abstentions": 0,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O0": {
+          "hits": 2,
+          "total": 2
+        },
+        "O1": {
+          "hits": 1,
+          "total": 1
+        },
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "generation.determinism": {
+      "overall": {
+        "hits": 10,
+        "total": 10,
+        "silent_failures": 0,
+        "correct_abstentions": 0,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O0": {
+          "hits": 2,
+          "total": 2
+        },
+        "O1": {
+          "hits": 1,
+          "total": 1
+        },
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    }
+  }
+}

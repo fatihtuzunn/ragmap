@@ -1,0 +1,23 @@
+{
+  "index": 19,
+  "query": "MHL-POL-014",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "MHL-POL-014",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 5587.28,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "1851",
+    "ETag": "W/\"73b-ZnzKD20XariBb8TBNaGyJMd4Rwk\"",
+    "Date": "Tue, 17 Nov 2026 19:40:18 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"13ed5656-67aa-4be9-abe7-9240f5ae6531\",\"type\":\"textResponse\",\"close\":true,\"error\":null,\"chatId\":274,\"textResponse\":\"MHL-POL-014 is an authentication and authorisation failure code.\",\"sources\":[{\"id\":\"08f03464-e42a-4d99-866d-331a8b84d4f3\",\"url\":\"file:///app/collector/hotdir/cb3ddd30-03-vendor-integration-standard.md\",\"title\":\"03-vendor-integration-standard.md\",\"docAuthor\":\"Unknown\",\"description\":\"Unknown\",\"docSource\":\"a text file uploaded by the user.\",\"chunkSource\":\"\",\"published\":\"11/17/2026, 10:14:27 AM\",\"wordCount\":940,\"token_count_estimate\":1716,\"text\":\"<document_metadata>\\nsourceDocument: 03-vendor-integration-standard.md\\npublished: 11/17/2026, 10:14:27 AM\\n</document_metadata>\\n\\nError codes are grouped by first character. Codes beginning with A are authentication\\nand authorisation failures. Codes beginning with V are validation failures and indicate\\nthat the request was understood but malformed. Codes beginning with R are resource\\nfailures: a referenced booking, container, or consignment does not exist or is not\\nvisible to the caller. Codes beginning with T are transient and the caller should retry\\nwith backoff. Codes beginning with E are internal errors and the caller should not\\nretry the same request without contacting support.\\n\\nThe complete code catalogue is published in the developer portal and is versioned\\nalongside this standard. Codes are never reused and never redefined; a code that is\\nwithdrawn is marked deprecated and continues to be documented.\\n\\n## 6. Correlation identifiers\",\"_distance\":0.7401109933853149,\"score\":0.25988900661468506}],\"metrics\":{\"prompt_tokens\":307,\"completion_tokens\":16,\"total_tokens\":323,\"outputTps\":9.794265335217913,\"duration\":1.633609,\"model\":\"llama3.2:3b\",\"provider\":\"OllamaAILLM\",\"timestamp\":\"2026-11-17T19:40:18.873Z\",\"inputCost\":0,\"outputCost\":0,\"totalCost\":0}}",
+  "error": null
+}

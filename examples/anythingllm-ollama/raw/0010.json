@@ -1,0 +1,23 @@
+{
+  "index": 10,
+  "query": "Summarise the main subjects covered in your knowledge base.",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "Summarise the main subjects covered in your knowledge base.",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 142.54,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-wi48Xd+mTNoob7IMPXa0NDTuNU8\"",
+    "Date": "Tue, 17 Nov 2026 19:38:03 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"c4a8f9fa-ee5e-4c13-9cab-7861ba0fe42b\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

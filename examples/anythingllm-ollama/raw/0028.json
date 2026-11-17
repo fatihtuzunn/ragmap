@@ -1,0 +1,23 @@
+{
+  "index": 28,
+  "query": "Name three primary colours.",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "Name three primary colours.",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 262.93,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-1oM1EKeTAQ1nAE67xLmjXjPbBg4\"",
+    "Date": "Tue, 17 Nov 2026 19:44:38 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"cf094d9e-b739-437b-bd0d-e46e41f00a37\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

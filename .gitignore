@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Scan output. ragmap writes a results directory per run, and those hold
+# retrieved passages - that is client data, not something to commit.
+ragmap-20*/
+scan-*/

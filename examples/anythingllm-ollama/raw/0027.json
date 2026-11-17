@@ -1,0 +1,23 @@
+{
+  "index": 27,
+  "query": "What is 23 plus 19?",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "What is 23 plus 19?",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 313.99,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-3DMZq2R/SZd6gplKQtOaWVf+4IE\"",
+    "Date": "Tue, 17 Nov 2026 19:44:38 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"73285b97-b940-471b-9399-d8f9bcff67d1\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

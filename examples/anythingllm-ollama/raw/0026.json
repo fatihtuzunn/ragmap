@@ -1,0 +1,23 @@
+{
+  "index": 26,
+  "query": "What is the capital of France?",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "What is the capital of France?",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 470.32,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-PYvjuJMRjf5crpsWMJ/rxMDMU3k\"",
+    "Date": "Tue, 17 Nov 2026 19:44:38 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"46412209-2e66-4695-a5a8-f80f28256030\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

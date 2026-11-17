@@ -1,0 +1,835 @@
+{
+  "tool": "ragmap",
+  "version": "0.1.0",
+  "target": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "level": 2,
+  "started_at": "2026-11-17T19:46:01+00:00",
+  "finished_at": "2026-11-17T19:46:01+00:00",
+  "duration_s": 554.21,
+  "requests_used": 32,
+  "budget": 35,
+  "spend": "quick",
+  "requests_saved": 4,
+  "tokens_used": 23122,
+  "tokens_measured": true,
+  "token_budget": 0,
+  "calibration_generated_at": "2026-11-17T17:19:22+00:00",
+  "facts": {
+    "channel.tokens": {
+      "label": "token counter",
+      "section": "interface",
+      "value": [
+        "metrics",
+        "metrics.prompt_tokens",
+        "metrics.completion_tokens",
+        "metrics.total_tokens"
+      ],
+      "display": "metrics, metrics.prompt_tokens, metrics.completion_tokens",
+      "status": "measured",
+      "reason": "",
+      "method": "token accounting fields present in responses",
+      "evidence": "context size is derivable from prompt tokens",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "chunk.overlap": {
+      "label": "overlap",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 4",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "chunk.size": {
+      "label": "size",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 3",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "corpus.absent_topic": {
+      "label": "off-corpus topic",
+      "section": "corpus",
+      "value": "medieval falconry training methods",
+      "display": "medieval falconry training methods",
+      "status": "measured",
+      "reason": "",
+      "method": "candidate put to the target and confirmed",
+      "evidence": "signal -3.0, refused",
+      "confidence": {
+        "kind": "derived",
+        "calibration": ""
+      }
+    },
+    "corpus.documents": {
+      "label": "documents",
+      "section": "corpus",
+      "value": [
+        "01-data-governance-policy.md",
+        "04-remote-access-policy.md",
+        "02-incident-response-plan.md",
+        "03-vendor-integration-standard.md",
+        "05-business-continuity-plan.md"
+      ],
+      "display": "5 visible ids",
+      "status": "measured",
+      "reason": "",
+      "method": "distinct identifiers returned in source fields across the whole scan",
+      "evidence": "01-data-governance-policy.md, 04-remote-access-policy.md, 02-incident-response-plan.md",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "corpus.identifiers": {
+      "label": "identifiers",
+      "section": "corpus",
+      "value": [
+        "MHL-POL-014",
+        "MHL-PLN-007",
+        "MHL-STD-022",
+        "MHL-PLN-003",
+        "MHL-POL-031",
+        "01-data-governance-policy.md",
+        "04-remote-access-policy.md",
+        "02-incident-response-plan.md",
+        "03-vendor-integration-standard.md",
+        "05-business-continuity-plan.md"
+      ],
+      "display": "MHL-POL-014, MHL-PLN-007, MHL-STD-022, MHL-PLN-003",
+      "status": "measured",
+      "reason": "",
+      "method": "identifier-shaped literals seen in passages and answers",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "corpus.rare_token": {
+      "label": "rare token",
+      "section": "corpus",
+      "value": "MHL-POL-014",
+      "display": "MHL-POL-014",
+      "status": "measured",
+      "reason": "",
+      "method": "candidate put to the target and confirmed",
+      "evidence": "signal 4.68, 1 sources",
+      "confidence": {
+        "kind": "derived",
+        "calibration": ""
+      }
+    },
+    "corpus.second_topic": {
+      "label": "second topic",
+      "section": "corpus",
+      "value": "Meridian Harbor Logistics",
+      "display": "Meridian Harbor Logistics",
+      "status": "measured",
+      "reason": "",
+      "method": "candidate put to the target and confirmed",
+      "evidence": "signal 11.9, 4 sources",
+      "confidence": {
+        "kind": "derived",
+        "calibration": ""
+      }
+    },
+    "corpus.topic": {
+      "label": "topic",
+      "section": "corpus",
+      "value": "Chief Data Officer and",
+      "display": "Chief Data Officer and",
+      "status": "measured",
+      "reason": "",
+      "method": "candidate put to the target and confirmed",
+      "evidence": "signal 12.86, 4 sources",
+      "confidence": {
+        "kind": "derived",
+        "calibration": ""
+      }
+    },
+    "corpus.topics": {
+      "label": "topics",
+      "section": "corpus",
+      "value": [
+        "01-data-governance-policy.md",
+        "04-remote-access-policy.md",
+        "Data Governance and Records Retention Policy",
+        "Meridian Harbor Logistics",
+        "Warehousing Custody Standard",
+        "People Operations Records Handbook",
+        "Compliance and",
+        "Internal Audit",
+        "Chief Data Officer and",
+        "The Chief Data Officer"
+      ],
+      "display": "01-data-governance-policy.md, 04-remote-access-policy.md, Data Governance and Records Retention Policy (+7)",
+      "status": "measured",
+      "reason": "",
+      "method": "extracted from meta-query answers and source labels",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "embedding.properties": {
+      "label": "properties",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 5",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "errors.verbosity": {
+      "label": "error detail",
+      "section": "interface",
+      "value": false,
+      "display": "clean",
+      "status": "measured",
+      "reason": "",
+      "method": "empty, type-confused and oversized inputs sent",
+      "evidence": "empty query:200, type-confused body:400, oversized query:200",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "generation.determinism": {
+      "label": "determinism",
+      "section": "generation",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 3",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "generation.verbatim": {
+      "label": "verbatim",
+      "section": "generation",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 3",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "iface.answer_path": {
+      "label": "answer path",
+      "section": "interface",
+      "value": "textResponse",
+      "display": "textResponse",
+      "status": "measured",
+      "reason": "",
+      "method": "first extractable string field in the reply",
+      "evidence": "",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "iface.auth": {
+      "label": "auth",
+      "section": "interface",
+      "value": true,
+      "display": "supplied by operator",
+      "status": "measured",
+      "reason": "",
+      "method": "credentials present in request configuration",
+      "evidence": "",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "iface.model": {
+      "label": "model",
+      "section": "interface",
+      "value": null,
+      "display": "",
+      "status": "not-applicable",
+      "reason": "response carries no model field",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "iface.product": {
+      "label": "product",
+      "section": "interface",
+      "value": null,
+      "display": "",
+      "status": "not-applicable",
+      "reason": "no product fingerprint in headers or body",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "iface.shape": {
+      "label": "shape",
+      "section": "interface",
+      "value": "anythingllm",
+      "display": "anythingllm",
+      "status": "measured",
+      "reason": "",
+      "method": "candidate request bodies tried until one answered",
+      "evidence": "2 shapes tried",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "iface.streaming": {
+      "label": "streaming",
+      "section": "interface",
+      "value": false,
+      "display": "not supported",
+      "status": "measured",
+      "reason": "",
+      "method": "same query requested with streaming enabled",
+      "evidence": "Content-Type: application/json; charset=utf-8",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "obs.chunk_text": {
+      "label": "chunk text",
+      "section": "retrieval",
+      "value": true,
+      "display": "exposed",
+      "status": "measured",
+      "reason": "",
+      "method": "longest passage field seen: 1004 chars",
+      "evidence": "",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "obs.level": {
+      "label": "observability",
+      "section": "retrieval",
+      "value": "O3",
+      "display": "O3",
+      "status": "measured",
+      "reason": "",
+      "method": "field inspection, then prose attribution",
+      "evidence": "passage text and scores exposed",
+      "confidence": {
+        "kind": "derived",
+        "calibration": "cal 10/10"
+      }
+    },
+    "obs.scores": {
+      "label": "scores",
+      "section": "retrieval",
+      "value": true,
+      "display": "exposed",
+      "status": "measured",
+      "reason": "",
+      "method": "numeric relevance field inside source entries",
+      "evidence": "",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "obs.source_field": {
+      "label": "source field",
+      "section": "retrieval",
+      "value": "sources",
+      "display": "sources",
+      "status": "measured",
+      "reason": "",
+      "method": "structural search for a retrieved-passage list",
+      "evidence": "",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "rag.present": {
+      "label": "rag present",
+      "section": "retrieval",
+      "value": true,
+      "display": "yes",
+      "status": "measured",
+      "reason": "",
+      "method": "retrieved passages present in the response",
+      "evidence": "source field 'sources'",
+      "confidence": {
+        "kind": "direct",
+        "calibration": ""
+      }
+    },
+    "retrieval.mode": {
+      "label": "mode",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 3",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "retrieval.reranker": {
+      "label": "reranker",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 4",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "retrieval.threshold": {
+      "label": "threshold",
+      "section": "retrieval",
+      "value": "off domain",
+      "display": "applied (cuts at 'off domain')",
+      "status": "measured",
+      "reason": "",
+      "method": "relevance ladder from on-topic down to nonsense",
+      "evidence": "on topic:4, related:4, off domain:0, nonsense:0; lowest surviving score above 0.510",
+      "confidence": {
+        "kind": "derived",
+        "calibration": "cal 4/4"
+      }
+    },
+    "retrieval.top_k": {
+      "label": "top-k",
+      "section": "retrieval",
+      "value": 4,
+      "display": "4 (fixed)",
+      "status": "measured",
+      "reason": "",
+      "method": "source-list length across differently shaped queries",
+      "evidence": "6/6 queries returned 4",
+      "confidence": {
+        "kind": "direct",
+        "calibration": "cal 4/4, MAE 0"
+      }
+    },
+    "routing.cache": {
+      "label": "cache",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "skipped-level",
+      "reason": "needs --level 3",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    },
+    "routing.router": {
+      "label": "router",
+      "section": "retrieval",
+      "value": null,
+      "display": "",
+      "status": "not-applicable",
+      "reason": "a threshold is applied, which voids the zero-source signal, and the answers differ too much in length (72 vs 282 chars) for the +20118ms gap to mean anything",
+      "method": "",
+      "evidence": "",
+      "confidence": {
+        "kind": "heuristic",
+        "calibration": ""
+      }
+    }
+  },
+  "findings": [
+    {
+      "id": "RAGMAP-006",
+      "title": "Chunk text exposed in API response",
+      "severity": "medium",
+      "summary": "passages returned in 'sources' (longest 1004 chars)",
+      "detail": "Retrieved passages are returned as structured fields, so corpus content is readable without any extraction technique.",
+      "evidence": "1004 characters of corpus text in one field",
+      "facts": [
+        "obs.chunk_text",
+        "obs.source_field"
+      ]
+    },
+    {
+      "id": "RAGMAP-003",
+      "title": "Token counter exposed",
+      "severity": "low",
+      "summary": "prompt token counts returned to the caller",
+      "detail": "Prompt token counts reveal the size of the assembled context, which leaks chunk size times top-k even when nothing else is visible.",
+      "evidence": "metrics, metrics.prompt_tokens, metrics.completion_tokens, metrics.total_tokens",
+      "facts": [
+        "channel.tokens"
+      ]
+    },
+    {
+      "id": "RAGMAP-005",
+      "title": "Source identifier disclosure",
+      "severity": "low",
+      "summary": "5 document identifiers visible",
+      "detail": "Responses carry document names, paths or page numbers, mapping the corpus structure for an attacker.",
+      "evidence": "01-data-governance-policy.md, 04-remote-access-policy.md, 02-incident-response-plan.md, 03-vendor-integration-standard.md, 05-business-continuity-plan.md",
+      "facts": [
+        "corpus.documents"
+      ]
+    },
+    {
+      "id": "RAGMAP-009",
+      "title": "Similarity scores exposed",
+      "severity": "low",
+      "summary": "relevance scores returned with each passage",
+      "detail": "Relevance scores are returned, giving direct feedback for tuning retrieval-manipulation attempts.",
+      "evidence": "",
+      "facts": [
+        "obs.scores"
+      ]
+    }
+  ],
+  "chunks": [
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nThe policy does not cover physical goods held in custody, which are governed by the\nWarehousing Custody Standard, nor does it cover personnel disciplinary files, which are\ngoverned by the People Operations Records Handbook.\n\n## 3. Record classification\n\nEvery record carries exactly one classification. The classification is assigned at\ncreation by the originating system or, for manually created material, by the author.\n\n**Tier 1 - Regulated commercial records.** Customs declarations, bills of lading,\ndangerous goods manifests, carrier settlement statements, and the signed contracts that\nsupport them. These records carry statutory obligations in every jurisdiction in which\nthe company operates.",
+      "query": "What are the key policies or procedures described in your documents?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.48106300830841064,
+      "chars": 823
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n# Meridian Harbor Logistics - Data Governance and Records Retention Policy\n\nDocument ID: MHL-POL-014\nVersion: 4.2\nOwner: Office of the Chief Data Officer\nClassification: Internal - Approved for Staff Distribution\n\n## 1. Purpose\n\nThis policy establishes how Meridian Harbor Logistics creates, classifies, stores,\nprotects, retains, and finally disposes of recorded information across every business\nunit. It applies to structured records held in the freight management platform, to\nsemi-structured operational telemetry emitted by terminal equipment, and to\nunstructured material such as correspondence, scanned bills of lading, and internal\nreports. The policy exists so that a single, predictable rule set governs the life of a\nrecord from the moment it is created until the moment it is irreversibly destroyed, and\nso that no department invents its own private retention practice.",
+      "query": "What are the key policies or procedures described in your documents?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.455683171749115,
+      "chars": 1004
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 9. Roles and responsibilities\n\nThe Chief Data Officer owns this policy and the retention schedule. Data stewards,\nappointed one per business unit, classify new record types, respond to audit findings,\nand act as the first point of contact for retention questions. System owners are\naccountable for ensuring that the systems they operate are registered with the records\nengine and that disposal actually executes. Every employee is responsible for not\ncreating unmanaged copies.\n\n## 10. Compliance and exceptions",
+      "query": "What are the key policies or procedures described in your documents?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.45376330614089966,
+      "chars": 636
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 10. Compliance and exceptions\n\nInternal Audit tests this policy twice yearly against a sample of record types drawn\nfrom each tier. Findings are tracked to closure in the enterprise issue register.\nExceptions are time-bound, require the written approval of the Chief Data Officer and\nthe relevant business unit director, and expire after twelve months unless renewed.\nThere is no such thing as a permanent exception to this policy.\n\nQuestions about the application of this policy are directed to the data steward of the\nrelevant business unit in the first instance, and to the Office of the Chief Data\nOfficer where the steward cannot resolve them.",
+      "query": "What are the key policies or procedures described in your documents?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.4122358560562134,
+      "chars": 773
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nWhere company records are used to train or tune statistical or machine learning models,\nthe training corpus is itself a record and is classified according to the highest tier\nit contains. Derived model weights are not treated as records under this policy, but the\ncorpus, the preprocessing configuration, and the evaluation set are. Teams must be able\nto reconstruct which records entered a given training run; where this is not possible,\nthe run may not be used for a production decision.\n\n## 9. Roles and responsibilities",
+      "query": "What documents do you have access to? List their titles.",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.37064266204833984,
+      "chars": 645
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 04-remote-access-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 3. Devices\n\nRemote access is permitted only from a managed device. A managed device is enrolled in\nthe company endpoint management platform, carries full disk encryption, runs a supported\noperating system version, has the endpoint detection agent installed and reporting, and\nhas received security updates within the last fourteen days. A device that falls out of\ncompliance loses access automatically and regains it when compliance is restored.\n\nPersonal devices may be used for electronic mail and calendar through the managed\ncontainer only. No other company system is reachable from a personal device. Printing\ncompany material at home is not permitted; where a physical copy is genuinely required\nit is produced at a company facility and handled under the clear desk standard.\n\n## 4. Network access",
+      "query": "What documents do you have access to? List their titles.",
+      "doc_id": null,
+      "title": "04-remote-access-policy.md",
+      "page": null,
+      "score": 0.31152021884918213,
+      "chars": 926
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 5. Legal hold\n\nA legal hold suspends deletion. When the General Counsel issues a hold, the records\nengine marks the affected record set and the automated disposal routine skips it. A\nrecord under hold is retained until the hold is lifted in writing, regardless of its\nscheduled retention period. Staff who become aware of actual or threatened litigation,\na regulatory inquiry, or a customs investigation must notify Legal within one business\nday and must not delete or alter potentially relevant material in the interim.\n\nHolds are reviewed quarterly. A hold that has been open for more than eighteen months\nwithout a documented reason is escalated to the Data Governance Council for a decision\nto continue or release.\n\n## 6. Disposal",
+      "query": "What documents do you have access to? List their titles.",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.3112095594406128,
+      "chars": 859
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nThese four figures - ten years, seven years, one hundred and eighty days, and thirty\ndays - constitute the complete retention schedule. No business unit may extend a\nretention period by local decision. Where a longer period is genuinely required, the\nrequest is submitted to the Office of the Chief Data Officer with a written statutory or\ncontractual basis, and if accepted it is published as an amendment to this section\nrather than kept as an informal exception.\n\nRetention periods are measured from the event date carried on the record, not from the\ndate the record was ingested into a given system. A record copied into a downstream\nanalytics store inherits the retention clock of its source; the copy does not start a\nnew clock. This is the single most frequently misunderstood provision of this policy and\nit is the provision most often found violated during internal audit.",
+      "query": "What does the document say about Data Governance and Records Retention Policy?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.6469383239746094,
+      "chars": 1003
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nMeridian Harbor Logistics operates inland terminals and bonded warehousing in four\nregions. Each region previously maintained separate archival conventions. The 4.0\nrevision of this policy consolidated those conventions; the present revision clarifies\nthe treatment of telemetry and model training corpora.\n\n## 2. Scope\n\nThis policy binds all employees, contractors, secondees, and third-party processors who\nhandle company records in any medium. It covers primary systems of record, replicas,\nbackups, exports, analytics extracts, and any copy held on an endpoint device. A copy of\na record is a record. Staff may not create a parallel retention regime by moving data\ninto a personal drive, a spreadsheet, a messaging thread, or an unmanaged cloud bucket.",
+      "query": "What does the document say about People Operations Records Handbook?",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.492722749710083,
+      "chars": 878
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 02-incident-response-plan.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 3. Roles\n\nThe **duty analyst** holds first-line responsibility around the clock and is the only\nrole permitted to declare an incident. The **incident manager** coordinates the response\nonce an incident is declared and is drawn from a rota of six trained staff. The\n**technical lead** is appointed by the incident manager for each incident and directs\ncontainment and recovery work. The **communications lead** owns all internal and\nexternal messaging. The **executive sponsor** is the Chief Information Security Officer\nor, in their absence, the Chief Operating Officer.\n\nNamed deputies exist for every role. No role may be left vacant during an active\nincident; if the primary holder is unreachable for fifteen minutes, the deputy assumes\nthe role automatically and does not wait for a handover.\n\n## 4. Severity classification",
+      "query": "What does the document say about The Chief Data Officer?",
+      "doc_id": null,
+      "title": "02-incident-response-plan.md",
+      "page": null,
+      "score": 0.518517017364502,
+      "chars": 952
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 02-incident-response-plan.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n# Meridian Harbor Logistics - Security Incident Response Plan\n\nDocument ID: MHL-PLN-007\nVersion: 3.1\nOwner: Security Operations Centre\nClassification: Internal - Approved for Staff Distribution\n\n## 1. Purpose and scope\n\nThis plan describes how Meridian Harbor Logistics detects, triages, contains, and\nrecovers from security incidents affecting its information systems, terminal control\nnetworks, and the data entrusted to it by customers and carriers. It applies to every\nincident irrespective of origin: external intrusion, malicious insider activity,\naccidental disclosure, supplier compromise, and failures of a control that could\nplausibly have led to any of these.\n\nThe plan is deliberately procedural. During an incident, people do not read reasoning;\nthey look for the next step and the name of the person who owns it. Explanatory material\nis confined to the appendices.\n\n## 2. Definitions",
+      "query": "What does the document say about Meridian Harbor Logistics?",
+      "doc_id": null,
+      "title": "02-incident-response-plan.md",
+      "page": null,
+      "score": 0.6394356489181519,
+      "chars": 1019
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 03-vendor-integration-standard.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n# Meridian Harbor Logistics - Vendor Integration and API Error Handling Standard\n\nDocument ID: MHL-STD-022\nVersion: 2.5\nOwner: Platform Engineering\nClassification: Internal - Approved for Staff and Approved Suppliers\n\n## 1. Purpose\n\nThis standard defines how external parties integrate with the Meridian Harbor Logistics\nfreight platform, what guarantees the platform offers them, and how errors are\nrepresented so that both sides can diagnose a failure without a telephone call. It is\nwritten for supplier engineering teams as much as for internal ones, and an approved\nsupplier may be given this document in full.\n\n## 2. Integration patterns\n\nThree patterns are supported and no others are offered.\n\n**Synchronous REST.** The caller issues an HTTPS request to the regional gateway and\nreceives a response within the published timeout. Used for lookups, bookings, and\nstatus queries.",
+      "query": "What does the document say about Meridian Harbor Logistics?",
+      "doc_id": null,
+      "title": "03-vendor-integration-standard.md",
+      "page": null,
+      "score": 0.6116259694099426,
+      "chars": 1011
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 05-business-continuity-plan.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n# Meridian Harbor Logistics - Business Continuity and Terminal Resilience Plan\n\nDocument ID: MHL-PLN-003\nVersion: 5.0\nOwner: Operational Resilience\nClassification: Internal - Approved for Staff Distribution\n\n## 1. Purpose\n\nThis plan sets out how Meridian Harbor Logistics continues to serve its customers when a\ndisruptive event removes people, premises, systems, or suppliers from normal operation.\nIt covers the four inland terminals, the bonded warehousing estate, the shared service\ncentre, and the freight platform on which all of them depend.\n\nContinuity planning is distinct from incident response. Incident response restores a\nfailed system. Continuity planning keeps the business operating while the system is\nstill failed. Both may run at once and they are coordinated through the operations\nbridge.\n\n## 2. Critical business services",
+      "query": "What does the document say about Meridian Harbor Logistics?",
+      "doc_id": null,
+      "title": "05-business-continuity-plan.md",
+      "page": null,
+      "score": 0.5994485020637512,
+      "chars": 967
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 05-business-continuity-plan.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nObjectives are tested, not asserted. An objective that has not been demonstrated in an\nexercise within the last twelve months is reported to the Operational Resilience\nCommittee as unverified, and the service is treated as though no objective exists.\n\n## 4. Manual workarounds\n\nEvery critical service has a workaround that functions without the freight platform.\nGate processing falls back to paper movement notes issued from a numbered pad held in\nthe gate office, with reconciliation into the platform once it returns. Customs\ndeclaration submission falls back to direct submission through the authority portal by\nthe customs team, at reduced volume. Dangerous goods authorisation falls back to the\nduty supervisor working from the printed segregation tables, which are reissued\nquarterly and held in the control room.",
+      "query": "What does the document say about Warehousing Custody Standard?",
+      "doc_id": null,
+      "title": "05-business-continuity-plan.md",
+      "page": null,
+      "score": 0.41053545475006104,
+      "chars": 944
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 04-remote-access-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n# Meridian Harbor Logistics - Remote Working and Privileged Access Policy\n\nDocument ID: MHL-POL-031\nVersion: 2.0\nOwner: Information Security\nClassification: Internal - Approved for Staff Distribution\n\n## 1. Purpose\n\nThis policy sets the conditions under which staff and contractors may access company\nsystems from outside a company facility, and the additional conditions that apply to\nprivileged access regardless of location. It replaces the separate remote working\nguideline and privileged access standard, which were found during the 2025 control\nreview to contain contradictory requirements on session duration.\n\n## 2. Eligibility",
+      "query": "What does the document say about deep sea mining permits?",
+      "doc_id": null,
+      "title": "04-remote-access-policy.md",
+      "page": null,
+      "score": 0.33825159072875977,
+      "chars": 755
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 05-business-continuity-plan.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n## 3. Recovery objectives\n\nRecovery objectives are expressed as a maximum tolerable period of disruption and a\nmaximum tolerable data loss. Gate processing and container release must be restored\nwithin two hours with no more than fifteen minutes of data loss. Customs declaration\nsubmission must be restored within four hours with no more than one hour of data loss.\nDangerous goods handling authorisation must be restored within one hour with no data\nloss, since the manual workaround for this service is intentionally conservative and\nreduces throughput sharply. Reefer monitoring must be restored within thirty minutes\nwith no data loss. The remaining three services carry a twenty-four hour objective.",
+      "query": "What does the document say about deep sea mining permits?",
+      "doc_id": null,
+      "title": "05-business-continuity-plan.md",
+      "page": null,
+      "score": 0.32181239128112793,
+      "chars": 829
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 03-vendor-integration-standard.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\nError codes are grouped by first character. Codes beginning with A are authentication\nand authorisation failures. Codes beginning with V are validation failures and indicate\nthat the request was understood but malformed. Codes beginning with R are resource\nfailures: a referenced booking, container, or consignment does not exist or is not\nvisible to the caller. Codes beginning with T are transient and the caller should retry\nwith backoff. Codes beginning with E are internal errors and the caller should not\nretry the same request without contacting support.\n\nThe complete code catalogue is published in the developer portal and is versioned\nalongside this standard. Codes are never reused and never redefined; a code that is\nwithdrawn is marked deprecated and continues to be documented.\n\n## 6. Correlation identifiers",
+      "query": "MHL-POL-014",
+      "doc_id": null,
+      "title": "03-vendor-integration-standard.md",
+      "page": null,
+      "score": 0.25988900661468506,
+      "chars": 949
+    },
+    {
+      "text": "<document_metadata>\nsourceDocument: 01-data-governance-policy.md\npublished: 11/17/2026, 10:14:27 AM\n</document_metadata>\n\n**Tier 2 - Operational records.** Dispatch plans, gate movements, yard assignments,\nequipment maintenance logs, and the incident records produced by the Security Operations\nCentre. These support internal accountability and dispute resolution.\n\n**Tier 3 - Operational telemetry.** High-volume machine-generated signals: crane position\nsamples, reefer temperature readings, gate sensor events, API access logs, and\napplication traces. Individually these records have negligible value; in aggregate they\nsupport capacity planning and fault diagnosis.\n\n**Tier 4 - Transient working material.** Drafts, scratch extracts, local caches, and\ninterim analytical outputs that are superseded by a published result.\n\n## 4. Retention schedule",
+      "query": "Explain Chief Data Officer and in detail.",
+      "doc_id": null,
+      "title": "01-data-governance-policy.md",
+      "page": null,
+      "score": 0.5132387280464172,
+      "chars": 851
+    }
+  ],
+  "modules": [
+    {
+      "name": "retrieval.mode",
+      "status": "skipped-level",
+      "reason": "requires --level 3",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "retrieval.reranker",
+      "status": "skipped-level",
+      "reason": "requires --level 4",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "routing.cache",
+      "status": "skipped-level",
+      "reason": "requires --level 3",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "generation.verbatim",
+      "status": "skipped-level",
+      "reason": "requires --level 3",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "generation.determinism",
+      "status": "skipped-level",
+      "reason": "requires --level 3",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "chunking.size",
+      "status": "skipped-level",
+      "reason": "requires --level 3",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "chunking.overlap",
+      "status": "skipped-level",
+      "reason": "requires --level 4",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "embedding.properties",
+      "status": "skipped-level",
+      "reason": "requires --level 5",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "interface.shape",
+      "status": "ran",
+      "reason": "",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "corpus.observed",
+      "status": "ran",
+      "reason": "",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "interface.tokens",
+      "status": "ran",
+      "reason": "",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "observability.level",
+      "status": "ran",
+      "reason": "",
+      "requests": 2,
+      "seconds": 59.01
+    },
+    {
+      "name": "interface.streaming",
+      "status": "ran",
+      "reason": "",
+      "requests": 1,
+      "seconds": 0.18
+    },
+    {
+      "name": "errors.verbosity",
+      "status": "ran",
+      "reason": "",
+      "requests": 3,
+      "seconds": 0.44
+    },
+    {
+      "name": "corpus.discover",
+      "status": "ran",
+      "reason": "",
+      "requests": 12,
+      "seconds": 151.49
+    },
+    {
+      "name": "retrieval.threshold",
+      "status": "ran",
+      "reason": "",
+      "requests": 1,
+      "seconds": 0.17
+    },
+    {
+      "name": "retrieval.topk",
+      "status": "ran",
+      "reason": "",
+      "requests": 5,
+      "seconds": 258.53
+    },
+    {
+      "name": "presence.rag",
+      "status": "ran",
+      "reason": "",
+      "requests": 0,
+      "seconds": 0.0
+    },
+    {
+      "name": "routing.router",
+      "status": "ran",
+      "reason": "",
+      "requests": 6,
+      "seconds": 83.82
+    }
+  ],
+  "notes": [
+    "Topic confirmation truncated by budget."
+  ]
+}

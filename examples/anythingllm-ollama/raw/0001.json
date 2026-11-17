@@ -1,0 +1,23 @@
+{
+  "index": 1,
+  "query": "What topics can you help me with?",
+  "url": "http://127.0.0.1:3001/api/v1/workspace/meridian-harbor-policies/chat",
+  "request_body": {
+    "message": "What topics can you help me with?",
+    "mode": "query"
+  },
+  "status": 200,
+  "latency_ms": 420.85,
+  "response_headers": {
+    "X-Powered-By": "Express",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8",
+    "Content-Length": "209",
+    "ETag": "W/\"d1-wSvapkvuYtveGGu0YCKM4LZ2aSE\"",
+    "Date": "Tue, 17 Nov 2026 19:36:47 GMT",
+    "Connection": "keep-alive",
+    "Keep-Alive": "timeout=5"
+  },
+  "raw_text": "{\"id\":\"5baa954c-091e-4681-ae9f-72d16fefa876\",\"type\":\"textResponse\",\"sources\":[],\"close\":true,\"error\":null,\"textResponse\":\"There is no relevant information in this workspace to answer your query.\",\"metrics\":{}}",
+  "error": null
+}

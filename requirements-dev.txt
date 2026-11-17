@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# The test suite (tests/run_all.py) is plain Python scripts with asserts
+# and needs nothing beyond the runtime requirements. This file adds the
+# linter used on the source.
+pyflakes>=3.2

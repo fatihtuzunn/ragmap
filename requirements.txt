@@ -1,0 +1,8 @@
+# Runtime dependencies for ragmap and for the lab server.
+#
+# One, deliberately. A reconnaissance tool gets run from a jump box, a
+# client laptop or a container that someone else built, and every extra
+# dependency is one more thing that has to be allowed through, pinned,
+# audited, or explained. Everything else ragmap needs is in the standard
+# library.
+requests>=2.31
