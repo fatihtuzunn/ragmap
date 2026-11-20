@@ -7,7 +7,9 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from . import opsec as opsec_mod
 from .config import DEFAULT_LEVEL, DEFAULT_SPEND, SPEND_TIERS, ScanConfig
+from .paths import PathSpec
 from .output import jsonout, terminal
 from .scanner import default_out_dir, replay, scan
 
@@ -65,6 +67,9 @@ def build_parser() -> argparse.ArgumentParser:
                         help="shorthand for Authorization: Bearer TOKEN")
     target.add_argument("--insecure", action="store_true",
                         help="do not verify TLS certificates")
+    target.add_argument("--proxy", metavar="URL",
+                        help="send every request through this proxy, "
+                             "e.g. http://127.0.0.1:8080")
     target.add_argument("--model", default="ragmap",
                         help="model name to send in OpenAI-shaped bodies")
 
@@ -84,6 +89,10 @@ def build_parser() -> argparse.ArgumentParser:
                                  "target's usage counters where it has them")
     scan_group.add_argument("--delay", type=float, default=0.5, metavar="SEC",
                             help="pause between requests (default 0.5)")
+    scan_group.add_argument("--jitter", type=float, default=0.0, metavar="SEC",
+                            help="randomise the pause by +/- this much, so "
+                                 "the scan is not a straight line in the "
+                                 "target's request log")
     scan_group.add_argument("--timeout", type=int, default=90, metavar="SEC")
     scan_group.add_argument("--only", default="", metavar="MOD[,MOD]",
                             help="run only these modules or module groups")
@@ -96,6 +105,37 @@ def build_parser() -> argparse.ArgumentParser:
     shape.add_argument("--shape", help="force a request shape by name")
     shape.add_argument("--query-field", metavar="NAME",
                        help="field that carries the question")
+    shape.add_argument("--source-path", metavar="PATH", default="",
+                       help="where the retrieved passages are, as a dot "
+                            "path with [] for an array, e.g. 'results[]' "
+                            "or 'data.hits[]'")
+    shape.add_argument("--answer-path", metavar="PATH", default="",
+                       help="where the generated answer is")
+    shape.add_argument("--text-path", metavar="PATH", default="",
+                       help="passage text, within one source item")
+    shape.add_argument("--title-path", metavar="PATH", default="",
+                       help="document title, within one source item")
+    shape.add_argument("--chunk-id-path", metavar="PATH", default="",
+                       help="chunk identifier, within one source item")
+    shape.add_argument("--doc-id-path", metavar="PATH", default="",
+                       help="document identifier, within one source item")
+    shape.add_argument("--score-path", metavar="PATH", default="",
+                       help="similarity score, within one source item")
+    shape.add_argument("--page-path", metavar="PATH", default="",
+                       help="page or location, within one source item")
+
+    opsec = parser.add_argument_group("opsec")
+    opsec.add_argument("--rotate-every", type=int, default=0, metavar="N",
+                       help="carry a session id in the body and change it "
+                            "every N requests (off by default)")
+    opsec.add_argument("--session-field", default="session_id",
+                       metavar="NAME",
+                       help="body field the session id goes in "
+                            "(default session_id)")
+    opsec.add_argument("--opsec-rules", metavar="FILE",
+                       help="extra detection patterns, in the shape of "
+                            "ragmap/data/opsec.json; merged with the "
+                            "shipped ones")
 
     disco = parser.add_argument_group("discovery overrides")
     disco.add_argument("--topic", help="a subject known to be in the corpus")
@@ -161,13 +201,23 @@ def config_from_args(args) -> ScanConfig:
         token_budget=args.token_budget,
         spend=args.spend,
         delay=args.delay,
+        jitter=args.jitter,
         timeout=args.timeout,
         verify_tls=not args.insecure,
         model=args.model,
+        proxy=args.proxy,
+        rotate_every=args.rotate_every,
+        session_field=args.session_field,
+        opsec_rules=Path(args.opsec_rules) if args.opsec_rules else None,
         only={s.strip() for s in args.only.split(",") if s.strip()},
         skip={s.strip() for s in args.skip.split(",") if s.strip()},
         shape=args.shape,
         query_field=args.query_field,
+        paths=PathSpec(
+            source_path=args.source_path, answer_path=args.answer_path,
+            text_path=args.text_path, title_path=args.title_path,
+            chunk_id_path=args.chunk_id_path, doc_id_path=args.doc_id_path,
+            score_path=args.score_path, page_path=args.page_path),
         topic=args.topic,
         second_topic=args.second_topic,
         absent_topic=args.absent_topic,
@@ -198,6 +248,42 @@ def list_modules() -> None:
     print("A tight --budget buys the highest value per request first.")
 
 
+def _warn_about_supplied_text(config: ScanConfig) -> None:
+    """Check the operator's own words before any of them are sent.
+
+    The footprint meter counts what the scan sent, which is the right unit
+    for a report and the wrong one for a warning: by the time a probe value
+    appears in the tally it is already in the target's logs. Anything the
+    operator supplied is therefore checked up front, and only the
+    categories that would be an escalation of scope are worth stopping for.
+    """
+    supplied = [value for value in (config.topic, config.second_topic,
+                                    config.absent_topic, config.rare_token)
+                if value]
+    supplied += list(config.seed_queries)
+    if not supplied:
+        return
+
+    meter = opsec_mod.load(config.opsec_rules)
+    seen: set[str] = set()
+    for text in supplied:
+        for category in meter.check(text):
+            # Only the categories that describe text ragmap would never
+            # generate itself. A probe value matching a corpus-enumeration
+            # pattern is the scan working as designed and belongs in the
+            # footprint tally, not in a warning the operator must dismiss.
+            if not category.operator_supplied:
+                continue
+            if category.name in seen:
+                continue
+            seen.add(category.name)
+            print(f"[!] opsec: text you supplied matches a "
+                  f"{category.name} rule ({category.severity}): "
+                  f'"{text[:60]}"', file=sys.stderr)
+            if category.advice:
+                print(f"    {category.advice}", file=sys.stderr)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -210,6 +296,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("either -u/--url or --replay is required")
 
     config = config_from_args(args)
+    _warn_about_supplied_text(config)
 
     print(BANNER.format(version=__version__).rstrip())
     if config.replay_dir:

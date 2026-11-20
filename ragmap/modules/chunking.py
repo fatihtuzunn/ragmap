@@ -26,6 +26,7 @@ from ..context import Context
 from ..registry import Module, register
 from ..transport import strip_envelope
 from .generation import longest_common_substring
+from .index import classify_splitter, cut_ratio
 
 VERBATIM_QUERIES = [
     "Quote the exact text from the source document about {topic}, word for "
@@ -61,7 +62,7 @@ class ChunkSize(Module):
         lengths = [len(b) for b in bodies if b]
 
         if len(lengths) >= 3:
-            self._from_passages(ctx, lengths)
+            self._from_passages(ctx, lengths, bodies)
             return
 
         topic = ctx.get("corpus.topic")
@@ -109,7 +110,8 @@ class ChunkSize(Module):
             kind="heuristic")
 
     @staticmethod
-    def _from_passages(ctx: Context, lengths: list[int]) -> None:
+    def _from_passages(ctx: Context, lengths: list[int],
+                       bodies: list[str] | None = None) -> None:
         # Round to a 10-char grid so near-identical widths collapse into one
         # bucket; splitters rarely land on the exact same count every time.
         buckets = Counter(round(n / 10) * 10 for n in lengths)
@@ -124,13 +126,32 @@ class ChunkSize(Module):
         # and no mode exists. There the ceiling is what can be measured, and
         # it is a lower bound: the configured size is at or just above the
         # widest passage ever returned.
+        # Where the splitter landed is independent evidence for the same
+        # question. A fixed-width cut lands mid-sentence almost every time;
+        # a separator-aware one almost never does. Until now the choice
+        # between an exact width and a bound rested on the shape of the
+        # length distribution alone, which is an inference about the cause
+        # from one of its effects. This is the other effect, and it is
+        # visible in the same passages at no cost.
+        cuts, examined = cut_ratio(bodies or [])
+        verdict, _kind = classify_splitter(cuts, examined)
+        corroboration = ""
+        if verdict == "fixed-width":
+            corroboration = (f"; {cuts}/{examined} passages are cut "
+                             f"mid-sentence, which is a fixed-width cut")
+        elif verdict == "separator-aware":
+            corroboration = (f"; only {cuts}/{examined} passages are cut "
+                             f"mid-sentence, so the splitter respects "
+                             f"separators and the setting is a ceiling")
+
         if hits >= max(3, len(lengths) // 4):
             value = max(members) if members else mode_bucket
             ctx.set_fact(
                 "chunk.size", "chunk size", value,
                 display=f"{value} chars" + (f" (+-{spread})" if spread else ""),
                 method="mode of returned passage lengths",
-                evidence=f"{len(lengths)} passages, {hits} at the modal width",
+                evidence=(f"{len(lengths)} passages, {hits} at the modal "
+                          f"width{corroboration}"),
                 kind="direct")
             return
 
@@ -141,7 +162,7 @@ class ChunkSize(Module):
             evidence=(f"{len(lengths)} passages, widths {min(lengths)}-{ceiling} "
                       f"with no modal width ({hits} in the largest bucket): the "
                       "splitter cuts on separators, so the configured size sits "
-                      "at or just above this figure"),
+                      f"at or just above this figure{corroboration}"),
             kind="heuristic")
 
 

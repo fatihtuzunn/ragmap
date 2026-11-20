@@ -11,6 +11,9 @@ SECTIONS = [
     ("retrieval", "retrieval"),
     ("corpus", "corpus"),
     ("generation", "generation"),
+    # Last on purpose: it describes the scan, not the target, and a reader
+    # should reach the target's facts first.
+    ("opsec", "opsec"),
 ]
 
 LABEL_W = 18
@@ -97,7 +100,9 @@ def _cap(text: str, limit: int) -> str:
 
 
 def _fact_line(p: Printer, fact: Fact) -> str:
-    label = fact.label[:LABEL_W].ljust(LABEL_W)
+    # Truncate one short of the column so a long label can never run into
+    # the value it belongs to.
+    label = fact.label[:LABEL_W - 1].ljust(LABEL_W)
     value = _cap(fact.rendered(), VALUE_CAP)
     bits: list[str] = []
     if fact.ok:
@@ -121,11 +126,24 @@ def _fact_line(p: Printer, fact: Fact) -> str:
 def _render_chunks(p: Printer, result: ScanResult, dump: bool, width: int) -> None:
     if not result.chunks:
         return
-    header = f"chunks ({len(result.chunks)} observed"
+    # A target at O2 names passages it will not show. Those are real
+    # disclosures and the identifier detectors read them, but there is no
+    # text to print, so they are counted here rather than listed as blanks.
+    shown = [c for c in result.chunks if (c.text or "").strip()]
+    named_only = len(result.chunks) - len(shown)
+    if not shown:
+        p.line(p.paint("[+] ", "32")
+               + f"chunks ({named_only} named by the target, none shown)")
+        p.line()
+        return
+
+    header = f"chunks ({len(shown)} observed"
+    if named_only:
+        header += f", {named_only} more named but not shown"
     header += ")" if dump else f", first {width} chars; --dump-chunks for full)"
     p.line(p.paint("[+] ", "32") + header)
 
-    for index, chunk in enumerate(result.chunks, start=1):
+    for index, chunk in enumerate(shown, start=1):
         meta = chunk.source_label
         if chunk.score is not None:
             meta += f"  score {chunk.score:.3f}"

@@ -188,10 +188,17 @@ what to expect before spending the time:
 
 ```
 examples/anythingllm-ollama/
-├── ragmap.txt      the report
-├── ragmap.json     the same facts, plus every passage in full
-└── raw/            all 32 exchanges, request and response
+├── ragmap.txt           the report, as the live scan printed it
+├── ragmap.json          the same facts, plus every passage in full
+├── replay-0.2.0.txt     the same exchanges, re-read by the current build
+└── raw/                 all 32 exchanges, request and response
 ```
+
+Those two reports are worth putting side by side. The live scan was run by
+an older build; `replay-0.2.0.txt` is what the current detectors make of
+the *same* recordings - splitter family, chunk ids, token geometry, four
+facts that did not exist when the scan was taken. Nothing was sent to the
+target to get them.
 
 ```bash
 ragmap --replay examples/anythingllm-ollama     # re-analyse it, sends nothing
@@ -212,6 +219,9 @@ Put the scan output next to the table in step 2.
 | `token counter metrics.prompt_tokens` | exposed | Ollama reports usage, so ragmap meters itself on real counts |
 | `source field sources` | - | structural detection, no AnythingLLM-specific rule |
 | `router not applicable` | no router | a correct abstention, not a failure |
+| `splitter separator-aware` | RecursiveCharacterTextSplitter | 0 of 18 passages cut mid-sentence |
+| `id scheme opaque` | uuid chunk ids | random ids carry no order, so coverage is declined |
+| `chunk tokens median 195` | - | the unit the splitter is configured in |
 
 ### Why chunk size comes back as `>= 897` and not `900`
 

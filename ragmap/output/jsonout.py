@@ -65,6 +65,7 @@ def to_dict(result: ScanResult) -> dict:
                 "text": c.text,
                 "query": c.query,
                 "doc_id": c.doc_id,
+                "chunk_id": c.chunk_id,
                 "title": c.title,
                 "page": _safe(c.page),
                 "score": c.score,

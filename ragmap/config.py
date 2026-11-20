@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .paths import PathSpec
+
 
 DEFAULT_LEVEL = 3
 
@@ -45,9 +47,18 @@ class ScanConfig:
     token_budget: int = 0               # 0 => no token ceiling
     spend: str = DEFAULT_SPEND
     delay: float = 0.5
+    jitter: float = 0.0
     timeout: int = 90
     verify_tls: bool = True
     model: str = "ragmap"
+    proxy: str | None = None
+
+    # Session handling. Off unless the operator asks for it: inventing a
+    # body field the target did not ask for can change how it routes the
+    # request, and a recon tool should not alter what it is measuring.
+    rotate_every: int = 0
+    session_field: str = "session_id"
+    opsec_rules: Path | None = None
 
     only: set[str] = field(default_factory=set)
     skip: set[str] = field(default_factory=set)
@@ -56,6 +67,7 @@ class ScanConfig:
     # Manual overrides that let an operator skip detection entirely.
     shape: str | None = None
     query_field: str | None = None
+    paths: PathSpec = field(default_factory=PathSpec)
     topic: str | None = None
     second_topic: str | None = None
     absent_topic: str | None = None

@@ -146,14 +146,29 @@ def sparse_dot(a: dict, b: dict) -> float:
     return total
 
 
-def chunk_text(text: str, size: int, overlap: int) -> list[tuple[int, str]]:
-    """
-    A character-based sliding window, close to what AnythingLLM, Dify and
-    similar tools do by default: text is cut on a fixed character window
-    rather than on semantic boundaries.
+def chunk_text(text: str, size: int, overlap: int,
+               splitter: str = "fixed") -> list[tuple[int, str]]:
+    """Cut a document into passages, one of two ways.
+
+    ``fixed``     a character sliding window. Every chunk is exactly
+                  ``size`` wide except the last, and the cuts land wherever
+                  they land - usually mid-sentence.
+
+    ``recursive`` what LangChain's RecursiveCharacterTextSplitter does, and
+                  with it AnythingLLM and most LlamaIndex pipelines: prefer
+                  a paragraph break, then a sentence end, then a space, and
+                  only cut mid-word when nothing else fits. ``size`` is a
+                  CEILING here, not a width, which is why a scanner can only
+                  bound it from outside.
+
+    The two differ in exactly the way a chunk-quality detector claims to
+    see, which is the point of having both.
     """
     if overlap >= size:
         raise ValueError("overlap must be smaller than chunk_size")
+    if splitter == "recursive":
+        return _chunk_recursive(text, size, overlap)
+
     step = size - overlap
     out = []
     start = 0
@@ -164,6 +179,46 @@ def chunk_text(text: str, size: int, overlap: int) -> list[tuple[int, str]]:
         if start + size >= len(text):
             break
         start += step
+    return out
+
+
+# Tried in order, best boundary first. A cut is taken at the last one that
+# falls inside the window and leaves at least half a chunk behind.
+#
+# Sentence ends come before a single newline on purpose. LangChain's
+# default order puts "\n" second, which is right for prose that is not
+# hard-wrapped and wrong for anything that is - and this corpus is
+# wrapped at about 83 columns, as plenty of real documentation is.
+# Taking every wrapped line as a boundary would cut mid-sentence
+# constantly and make this mode indistinguishable from the fixed one,
+# which would defeat the reason it exists.
+_SEPARATORS = ("\n\n", ". ", "? ", "! ", "; ", "\n", " ")
+
+
+def _chunk_recursive(text: str, size: int, overlap: int) -> list[tuple[int, str]]:
+    out: list[tuple[int, str]] = []
+    start = 0
+    length = len(text)
+
+    while start < length:
+        end = min(start + size, length)
+        if end < length:
+            floor = start + size // 2
+            for separator in _SEPARATORS:
+                found = text.rfind(separator, floor, end)
+                if found > 0:
+                    end = found + len(separator)
+                    break
+        piece = text[start:end]
+        if piece.strip():
+            out.append((start, piece))
+        if end >= length:
+            break
+        # Step back by the overlap, then forward to the next word boundary
+        # so the overlap itself does not start mid-word.
+        nxt = max(start + 1, end - overlap)
+        space = text.find(" ", nxt, min(nxt + 40, length))
+        start = (space + 1) if space != -1 else nxt
     return out
 
 
@@ -191,10 +246,12 @@ class Chunk:
 class Index:
     """A TF-IDF index. No dependencies, deterministic, fast."""
 
-    def __init__(self, corpus_dir: Path, chunk_size: int, chunk_overlap: int):
+    def __init__(self, corpus_dir: Path, chunk_size: int, chunk_overlap: int,
+                 splitter: str = "fixed"):
         self.corpus_dir = corpus_dir
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.splitter = splitter
         self.chunks: list[Chunk] = []
         self.documents: list[dict] = []
         self.df: Counter = Counter()
@@ -212,7 +269,8 @@ class Index:
             first_line = next((l for l in raw.splitlines() if l.startswith("# ")), path.stem)
             title = first_line.lstrip("# ").strip()
             doc_id = path.stem
-            pieces = chunk_text(raw, self.chunk_size, self.chunk_overlap)
+            pieces = chunk_text(raw, self.chunk_size, self.chunk_overlap,
+                                self.splitter)
             for i, (start, text) in enumerate(pieces):
                 # Sayfa numarasi simulasyonu: PDF yukleyen araclarda chunk'lar
                 # sayfa etiketi tasir. 3 chunk = 1 sayfa kabul ediyoruz.
@@ -306,6 +364,9 @@ DEFAULTS = {
     "top_k": 4,
     "similarity_threshold": None,
     "retrieval_mode": "dense",
+    # fixed = a character sliding window; recursive = cuts on paragraph and
+    # sentence boundaries, which makes chunk_size a ceiling.
+    "splitter": "fixed",
     "expose_usage": True,
     # expose_scores / expose_chunk_text / expose_identifiers / emit_sources
     # DELIBERATELY absent here: their defaults come from the observability
@@ -580,11 +641,13 @@ class Engine:
         self._cache: dict[str, dict] = {}
         self._lock = threading.Lock()
 
-    def index_for(self, chunk_size: int, overlap: int) -> Index:
-        key = (chunk_size, overlap)
+    def index_for(self, chunk_size: int, overlap: int,
+                  splitter: str = "fixed") -> Index:
+        key = (chunk_size, overlap, splitter)
         with self._lock:
             if key not in self._indexes:
-                self._indexes[key] = Index(CORPUS_DIR, chunk_size, overlap)
+                self._indexes[key] = Index(CORPUS_DIR, chunk_size, overlap,
+                                           splitter)
             return self._indexes[key]
 
     def answer(self, query: str, profile: dict) -> dict:
@@ -601,7 +664,8 @@ class Engine:
                 out["latency_ms"] = (time.perf_counter() - started) * 1000
                 return out
 
-        index = self.index_for(cfg["chunk_size"], cfg["chunk_overlap"])
+        index = self.index_for(cfg["chunk_size"], cfg["chunk_overlap"],
+                               cfg["splitter"])
 
         retrieved: list[dict] = []
         retrieval_ran = True
@@ -855,7 +919,9 @@ class Handler(BaseHTTPRequestHandler):
                 cfg = self._profile_from(parsed)
             except KeyError as exc:
                 return self._send(404, {"error": f"unknown profile: {exc.args[0]}"})
-            index = self.engine.index_for(cfg["chunk_size"], cfg["chunk_overlap"])
+            index = self.engine.index_for(cfg["chunk_size"],
+                                          cfg["chunk_overlap"],
+                                          cfg["splitter"])
             return self._send(200, {
                 "profile": cfg["_name"],
                 "_comment": cfg.get("_comment"),
@@ -868,6 +934,9 @@ class Handler(BaseHTTPRequestHandler):
                 "response_shape": cfg["response_shape"],
                 "chunk_size": cfg["chunk_size"],
                 "chunk_overlap": cfg["chunk_overlap"],
+                "splitter": cfg["splitter"],
+                "chunk_id_scheme": "per document",
+                "chunk_id_collisions": 0,
                 "top_k": cfg["top_k"],
                 "similarity_threshold": cfg["similarity_threshold"],
                 "retrieval_mode": cfg["retrieval_mode"],
@@ -1061,7 +1130,8 @@ def main() -> None:
     # Build the index up front so the first request's latency is not an
     # outlier.
     warm = effective(profiles[args.profile])
-    index = engine.index_for(warm["chunk_size"], warm["chunk_overlap"])
+    index = engine.index_for(warm["chunk_size"], warm["chunk_overlap"],
+                             warm["splitter"])
 
     Handler.engine = engine
     Handler.profiles = profiles

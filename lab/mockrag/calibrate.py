@@ -129,13 +129,35 @@ def compare(fact_key: str, fact, truth: dict):
         expected = truth.get("temperature", 0) == 0
         return (bool(value) == expected), None, expected
 
+    if fact_key == "chunk.splitter":
+        expected = {"fixed": "fixed-width",
+                    "recursive": "separator-aware"}.get(truth.get("splitter"))
+        return (value == expected), None, expected
+
+    if fact_key == "chunk.id_scheme":
+        # The lab scopes chunk ids per document. What varies is whether the
+        # target shows them at all, so this scores the abstention as much
+        # as the reading.
+        expected = truth.get("chunk_id_scheme", "per document")
+        return (value == expected), None, expected
+
+    if fact_key == "chunk.collisions":
+        expected = truth.get("chunk_id_collisions", 0)
+        actual = 0 if value in (0, None, []) else len(value)
+        return (actual == expected), None, expected
+
     return None, None, None
 
 
 # Facts that should have been measurable given what the target exposes.
 def measurable(fact_key: str, truth: dict) -> bool:
-    if fact_key in ("chunk.overlap",):
+    if fact_key in ("chunk.overlap", "chunk.splitter"):
         return bool(truth["expose_chunk_text"])
+    if fact_key in ("chunk.id_scheme", "chunk.collisions"):
+        # Chunk identifiers only reach the caller when the target emits
+        # them; with none in the response there is nothing to read.
+        return bool(truth["emit_sources"]) and bool(
+            truth["expose_identifiers"])
     if fact_key == "chunk.size":
         # Either the passages are visible, or the generation layer has to be
         # willing to quote them. With a verbatim guard and no visible
@@ -156,7 +178,8 @@ def measurable(fact_key: str, truth: dict) -> bool:
 
 TRACKED = ["obs.level", "retrieval.top_k", "chunk.size", "chunk.overlap",
            "retrieval.threshold", "retrieval.mode", "routing.router",
-           "routing.cache", "generation.determinism"]
+           "routing.cache", "generation.determinism", "chunk.splitter",
+           "chunk.id_scheme", "chunk.collisions"]
 
 
 def main() -> None:

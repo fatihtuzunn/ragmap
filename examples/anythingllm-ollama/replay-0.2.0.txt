@@ -1,0 +1,141 @@
+
+[+] interface
+    shape             from recording
+    answer path       textResponse
+    token counter     metrics, metrics.prompt_tokens, metrics.completio...  [context size is derivable from prompt tokens]
+    auth              not applicable              replay sends no requests
+    model             not applicable              replay sends no requests
+    product           not applicable              replay sends no requests
+    streaming         not applicable              replay sends no requests
+    verbosity         not applicable              replay sends no requests
+
+[+] retrieval
+    source field      sources
+    chunk text        exposed
+    scores            exposed
+    observability     O3                          [passage text and scores exposed | cal 10/10]
+    present           not applicable              replay sends no requests
+    general ms        not applicable              replay sends no requests
+    corpus ms         not applicable              replay sends no requests
+    threshold         not applicable              replay sends no requests
+    top k             not applicable              replay sends no requests
+    router            not applicable              replay sends no requests
+    size              not applicable              replay sends no requests
+    cache             not applicable              replay sends no requests
+    mode              not applicable              replay sends no requests
+
+[+] corpus
+    documents         5 visible ids               [01-data-governance-policy.md, 04-remote-access-policy.md, 02-incident-response-plan.md]
+    identifiers       MHL-POL-014, MHL-PLN-007, MHL-STD-022, MHL-PLN-003
+    id scheme         opaque (random identifiers)  [43ca1818-4b57-4b44-9afb-e108b1e1effc | cal 4/4]
+    id collisions     none                        [cal 4/4]
+    chunk tokens      median 195, p95 221, max 224 (estimated)  [fits an encoder window of 256]
+    splitter          separator-aware (0/18 cut mid-sentence)  [cal 4/4]
+    duplicates        none across documents
+    coverage          not applicable              identifiers are random, so nothing about order or coverage follows from them
+    topic             not applicable              replay sends no requests
+    second topic      not applicable              replay sends no requests
+    absent topic      not applicable              replay sends no requests
+    rare token        not applicable              replay sends no requests
+    topics            not applicable              replay sends no requests
+
+[+] generation
+    determinism       not applicable              replay sends no requests
+    verbatim          not applicable              replay sends no requests
+
+[+] opsec
+    footprint         not applicable              no detection ruleset is loaded
+    pacing            not applicable              no detection ruleset is loaded
+
+[+] chunks (18 observed, first 200 chars; --dump-chunks for full)
+    [01] 01-data-governance-policy.md  score 0.481
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> The policy does
+         not cover physical goods held in custody, which are governed by...
+    [02] 01-data-governance-policy.md  score 0.456
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> # Meridian
+         Harbor Logistics - Data Governance and Records Retention Policy Docu...
+    [03] 01-data-governance-policy.md  score 0.454
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 9. Roles and
+         responsibilities The Chief Data Officer owns this policy and th...
+    [04] 01-data-governance-policy.md  score 0.412
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 10.
+         Compliance and exceptions Internal Audit tests this policy twice yearly
+         ...
+    [05] 01-data-governance-policy.md  score 0.371
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> Where company
+         records are used to train or tune statistical or machine learning...
+    [06] 04-remote-access-policy.md  score 0.312
+         <document_metadata> sourceDocument: 04-remote-access-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 3. Devices
+         Remote access is permitted only from a managed device. A managed de...
+    [07] 01-data-governance-policy.md  score 0.311
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 5. Legal hold
+         A legal hold suspends deletion. When the General Counsel issue...
+    [08] 01-data-governance-policy.md  score 0.647
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> These four
+         figures - ten years, seven years, one hundred and eighty days, and t...
+    [09] 01-data-governance-policy.md  score 0.493
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> Meridian Harbor
+         Logistics operates inland terminals and bonded warehousing in f...
+    [10] 02-incident-response-plan.md  score 0.519
+         <document_metadata> sourceDocument: 02-incident-response-plan.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 3. Roles The
+         **duty analyst** holds first-line responsibility around the clo...
+    [11] 02-incident-response-plan.md  score 0.639
+         <document_metadata> sourceDocument: 02-incident-response-plan.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> # Meridian
+         Harbor Logistics - Security Incident Response Plan Document ID: MHL-...
+    [12] 03-vendor-integration-standard.md  score 0.612
+         <document_metadata> sourceDocument: 03-vendor-integration-standard.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> # Meridian
+         Harbor Logistics - Vendor Integration and API Error Handling St...
+    [13] 05-business-continuity-plan.md  score 0.599
+         <document_metadata> sourceDocument: 05-business-continuity-plan.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> # Meridian
+         Harbor Logistics - Business Continuity and Terminal Resilience Pla...
+    [14] 05-business-continuity-plan.md  score 0.411
+         <document_metadata> sourceDocument: 05-business-continuity-plan.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> Objectives are
+         tested, not asserted. An objective that has not been demonstra...
+    [15] 04-remote-access-policy.md  score 0.338
+         <document_metadata> sourceDocument: 04-remote-access-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> # Meridian
+         Harbor Logistics - Remote Working and Privileged Access Policy
+         Documen...
+    [16] 05-business-continuity-plan.md  score 0.322
+         <document_metadata> sourceDocument: 05-business-continuity-plan.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> ## 3. Recovery
+         objectives Recovery objectives are expressed as a maximum tole...
+    [17] 03-vendor-integration-standard.md  score 0.260
+         <document_metadata> sourceDocument: 03-vendor-integration-standard.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> Error codes are
+         grouped by first character. Codes beginning with A are aut...
+    [18] 01-data-governance-policy.md  score 0.513
+         <document_metadata> sourceDocument: 01-data-governance-policy.md
+         published: 11/17/2026, 10:14:27 AM </document_metadata> **Tier 2 -
+         Operational records.** Dispatch plans, gate movements, yard assignme...
+
+[!] findings
+    RAGMAP-006  medium  Chunk text exposed in API response
+                         passages returned in 'sources' (longest 1019 chars)
+    RAGMAP-003  low     Token counter exposed
+                         prompt token counts returned to the caller
+    RAGMAP-005  low     Source identifier disclosure
+                         5 document identifiers visible
+    RAGMAP-009  low     Similarity scores exposed
+                         relevance scores returned with each passage
+
+[*] notes
+    - Replayed 32 recorded exchanges; no requests were sent.
+    - Passage lengths in tokens are estimated at four characters each. Install
+      the optional tokeniser for real counts: pip install 'ragmap[tokens]'.
+
+[*] 4 findings | 0 requests | 00:00:00

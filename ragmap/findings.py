@@ -50,6 +50,21 @@ CATALOG: dict[str, tuple[str, str, str]] = {
     "RAGMAP-010": (
         "Unauthenticated chat endpoint", "high",
         "The endpoint answered without credentials."),
+    "RAGMAP-011": (
+        "Chunk identifier collision across documents", "medium",
+        "One identifier is used by passages from different documents, so the "
+        "store cannot tell them apart: a hit on one can return the other, and "
+        "any per-document access rule keyed on that id is unenforceable."),
+    "RAGMAP-012": (
+        "Passages indexed under more than one document", "low",
+        "The same text is stored several times, so one topic can fill the "
+        "whole top-k with copies of itself and crowd out the rest of the "
+        "corpus."),
+    "RAGMAP-013": (
+        "Encoded data in the retrieval index", "medium",
+        "Passages that are base64 or similar encoded payloads rather than "
+        "prose were retrieved, which means file content reached the index "
+        "without being extracted and may carry material nobody reviewed."),
 }
 
 

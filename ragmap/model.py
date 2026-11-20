@@ -100,6 +100,12 @@ class Chunk:
     text: str
     query: str = ""
     doc_id: str | None = None
+    # The identifier of the passage itself, not of its document. It was
+    # already being read off the response and then dropped here, which cost
+    # the scan everything a chunk id can say: how a corpus is indexed, how
+    # much of a document has been seen, and whether two documents share an
+    # id they should not.
+    chunk_id: str | None = None
     title: str | None = None
     page: Any = None
     score: float | None = None
@@ -111,12 +117,23 @@ class Chunk:
             parts.append(f"p{self.page}")
         return "  ".join(parts) if parts else "(unidentified source)"
 
+    @property
+    def named_only(self) -> bool:
+        """Named by the target but not shown: identifiers, no passage."""
+        return not (self.text or "").strip()
+
     def fingerprint(self) -> str:
         # Fingerprint the passage body. A product that prefixes every chunk
         # with a constant metadata header would otherwise make all passages
         # of one document look like the same chunk, and they would be
         # deduplicated away before anything could measure them.
         from .transport import strip_envelope
+        if self.named_only:
+            # Nothing to fingerprint but the name, so the identifier is the
+            # identity. Without this every hidden passage of one document
+            # would collapse into one entry and the coverage bound would
+            # read a corpus of hundreds as a corpus of five.
+            return f"{self.doc_id or self.title or ''}|#{self.chunk_id or ''}"
         head = " ".join(strip_envelope(self.text).split())[:120]
         return f"{self.doc_id or self.title or ''}|{head}"
 
@@ -129,7 +146,11 @@ class ChunkStore:
         self.items: list[Chunk] = []
 
     def add(self, chunk: Chunk) -> bool:
-        if not chunk.text or not chunk.text.strip():
+        # A passage with neither text nor a name is nothing at all. One
+        # with a name and no text is an O2 disclosure and is kept: what the
+        # target refuses to show, it still agrees to count.
+        if not (chunk.text or "").strip() and not (
+                chunk.chunk_id or chunk.doc_id or chunk.title):
             return False
         key = chunk.fingerprint()
         if key in self._seen:

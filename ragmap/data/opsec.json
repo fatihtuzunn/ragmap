@@ -1,0 +1,157 @@
+{
+  "_readme": [
+    "Detection patterns a RAG recon scan trips, derived from the traffic",
+    "ragmap itself sends.",
+    "",
+    "This is not a generic prompt-attack list. Every category below was",
+    "written by reading a captured scan back and asking which of our own",
+    "queries a defender's prompt monitoring would pick out. That is why",
+    "there is no injection or credential-hunting category among the",
+    "scanner's own patterns: ragmap is read-only and sends nothing of that",
+    "shape. The two categories that do cover such text are marked",
+    "operator_supplied, because the only way such a string reaches the",
+    "wire is if someone passed it in --topic, --rare-token or",
+    "--seed-queries.",
+    "",
+    "A trigger is a pattern where * matches anything and literal fragments",
+    "match on word boundaries, so 'token' does not fire inside",
+    "'tokenisation'. Matching is case-insensitive.",
+    "",
+    "burst is the number of matches inside one minute that makes a pattern",
+    "count. One 'what does the document say about X' is a user; twenty in",
+    "a minute is a sweep, and only the second is worth reporting.",
+    "",
+    "Extend or replace with --opsec-rules FILE. A category of the same name",
+    "merges its triggers; a new name is added."
+  ],
+
+  "categories": {
+    "corpus_enumeration": {
+      "description": "Asking the assistant to list its own documents or subjects",
+      "severity": "high",
+      "advice": "ragmap opens discovery this way on purpose, because a target that answers has already given up the corpus map. Where quiet matters more, supply --topic, --second-topic, --absent-topic and --rare-token yourself: discovery is then skipped entirely. A few such queries remain either way, because shape detection has to ask something before anything is known.",
+      "triggers": [
+        "what documents * access",
+        "what topics *",
+        "what subjects *",
+        "list their titles",
+        "list them briefly",
+        "what * described in your documents",
+        "covered in your knowledge base",
+        "in your knowledge base",
+        "what * you help me with",
+        "what * can you answer",
+        "what * indexed",
+        "what * your corpus",
+        "what * your sources",
+        "enumerate *",
+        "inventory *"
+      ]
+    },
+
+    "document_sweep": {
+      "description": "The same framing repeated across many subjects",
+      "severity": "medium",
+      "burst": 8,
+      "advice": "This is the shape of topic confirmation and of every retrieval measurement after it, so it cannot be removed - only spread out. Raise --delay and --jitter, or drop a tier with --spend.",
+      "triggers": [
+        "what does the document say about *",
+        "what do your documents say about *",
+        "tell me about *",
+        "explain * in detail",
+        "details on *",
+        "briefly: *",
+        "list all * connected to *",
+        "what * policy",
+        "what * procedure"
+      ]
+    },
+
+    "verbatim_extraction": {
+      "description": "Asking for source text reproduced word for word",
+      "severity": "high",
+      "advice": "Unavoidable for the verbatim-leak check, which exists to prove that hiding citations does not hide the corpus. Drop it with --skip generation.verbatim where the finding is not worth the noise.",
+      "triggers": [
+        "quote the exact *",
+        "word for word",
+        "reproduce *",
+        "without summarising",
+        "without summarizing",
+        "the original wording",
+        "exact text from *",
+        "verbatim"
+      ]
+    },
+
+    "context_expansion": {
+      "description": "Pulling more of a passage than the answer offered",
+      "severity": "medium",
+      "advice": "Ask a separate question about a neighbouring subject instead; adjacent passages come back on their own.",
+      "triggers": [
+        "every detail you have about *",
+        "and anything related",
+        "more context",
+        "the full text",
+        "the complete *",
+        "what comes before",
+        "what comes after",
+        "continue the passage"
+      ]
+    },
+
+    "malformed_input": {
+      "description": "Deliberately broken requests, used to read error handling",
+      "severity": "medium",
+      "advice": "Error-verbosity probing is a handful of requests but it is the loudest thing in the scan per request, and it often lands in a different log than chat traffic. --skip errors.verbosity removes it.",
+      "triggers": [
+        "aaaaaaaaaaaaaaaaaaaa"
+      ]
+    },
+
+    "off_domain_control": {
+      "description": "General-knowledge questions put to a corpus assistant",
+      "severity": "low",
+      "advice": "These are the control queries that make routing and thresholds measurable. They look like a confused user rather than an attacker, which is usually the quietest thing in the scan.",
+      "triggers": [
+        "what is the capital of *",
+        "what is * plus *",
+        "name three *",
+        "how many * are in *"
+      ]
+    },
+
+    "identifier_lookup": {
+      "description": "A bare internal identifier sent as the whole query",
+      "severity": "medium",
+      "advice": "A single rare literal is how lexical and dense retrieval are told apart; there is no softer form of it. It is one request.",
+      "triggers": [
+        "mhl-*",
+        "err-*"
+      ]
+    },
+
+    "operator_secrets": {
+      "description": "Operator-supplied text hunting for credentials",
+      "severity": "critical",
+      "operator_supplied": true,
+      "advice": "ragmap never generates this. It reached the wire through --topic, --rare-token or --seed-queries, and it moves the engagement from reconnaissance to something needing its own authorisation.",
+      "triggers": [
+        "password", "passphrase", "api key", "secret *", "access key",
+        "private key", "connection string", "credentials"
+      ]
+    },
+
+    "operator_injection": {
+      "description": "Operator-supplied text shaped like prompt injection",
+      "severity": "critical",
+      "operator_supplied": true,
+      "advice": "ragmap is read-only and sends nothing of this shape. A match means text you supplied would be logged as an attack attempt against your client.",
+      "triggers": [
+        "ignore * instructions", "ignore previous", "disregard *",
+        "system prompt", "your instructions", "reveal *",
+        "you are now *", "act as *", "pretend *", "jailbreak",
+        "developer mode"
+      ]
+    }
+  }
+}

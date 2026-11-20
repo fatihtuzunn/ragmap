@@ -18,12 +18,14 @@ body and normalise whatever we find.
 from __future__ import annotations
 
 import json
+import random
 import re
 
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 import requests
 
@@ -71,6 +73,9 @@ ANSWER_PATHS: tuple[tuple, ...] = (
     ("data", "response"),
     ("data", "text"),
 )
+
+from .opsec import Meter
+from .paths import PathSpec, resolve
 
 MIN_PASSAGE_CHARS = 80
 
@@ -444,7 +449,10 @@ class Transport:
                  body_template: dict | None = None, model: str = "ragmap",
                  timeout: int = 90, delay: float = 0.5, budget: int = 200,
                  verify_tls: bool = True, raw_dir: Path | None = None,
-                 token_budget: int = 0):
+                 token_budget: int = 0, proxy: str | None = None,
+                 jitter: float = 0.0, paths: PathSpec | None = None,
+                 rotate_every: int = 0, session_field: str = "session_id",
+                 opsec: Meter | None = None):
         self.url = url
         self.headers = {"Content-Type": "application/json", **(headers or {})}
         self.body_template = body_template
@@ -456,6 +464,29 @@ class Transport:
         self.raw_dir = raw_dir
         self.used = 0
         self.session = requests.Session()
+        # An intercepting proxy is how an operator watches a scan, replays
+        # one exchange by hand, or shows a client what was actually sent.
+        self.proxy = proxy
+        if proxy:
+            self.session.proxies.update({"http": proxy, "https": proxy})
+        # A scan that sends one request exactly every N seconds is a
+        # straight line in anyone's request log. Jitter spreads the pace
+        # around the operator's delay without changing its average.
+        self.jitter = max(0.0, jitter)
+        # Where the structural search is wrong, the operator says where to
+        # look instead. An empty spec means the structural search decides.
+        self.paths = paths or PathSpec()
+        # Some targets thread a conversation id through the body. Keeping
+        # one for the whole scan ties every probe together in the target's
+        # own logs; rotating it breaks that correlation.
+        self.rotate_every = max(0, rotate_every)
+        self.session_field = session_field
+        self.session_id = uuid4().hex
+        self.rotations = 0
+        self._since_rotation = 0
+        # What this scan would look like to whoever is watching the target.
+        # Measured, not promised: see ragmap/opsec.py.
+        self.opsec = opsec
         self.rate_limit: dict[str, str] = {}
         # How many times a rate-limited request is retried before the probe
         # is handed back as failed. Retries are real requests and are
@@ -582,6 +613,11 @@ class Transport:
             raise RuntimeError("no request shape has been established yet")
 
         body = substitute(template, query, self.model)
+        self._stamp_session(body)
+        if self.opsec is not None:
+            # Counted here rather than in send(): a retry is a second real
+            # request against the target and shows up in its logs twice.
+            self.opsec.observe(query)
 
         if self.token_budget:
             # Stop before the request that would cross the ceiling, not
@@ -631,15 +667,99 @@ class Transport:
 
         probe.answer_path, probe.answer = find_answer(probe.body)
         probe.source_field, probe.sources = find_sources(probe.body, probe.answer)
+        self._apply_paths(probe)
         probe.source_count = len(probe.sources) if probe.source_field else None
         probe.token_fields = find_token_fields(probe.body)
         self._charge(probe, body)
 
         self.used += 1
         self._record(probe, body)
-        if self.delay:
-            time.sleep(self.delay)
+        self._pause()
         return probe
+
+    def _pause(self) -> None:
+        if not self.delay and not self.jitter:
+            return
+        wait = self.delay + random.uniform(-self.jitter, self.jitter)
+        if wait > 0:
+            time.sleep(wait)
+
+    def _stamp_session(self, body: Any) -> None:
+        """Carry a session id in the body, rotating it every N requests.
+
+        Off by default: inventing a field the target did not ask for can
+        change how it routes the request, and a recon tool should not alter
+        the thing it is measuring without being told to.
+        """
+        if not self.rotate_every or not isinstance(body, dict):
+            return
+        body[self.session_field] = self.session_id
+        self._since_rotation += 1
+        if self._since_rotation >= self.rotate_every:
+            self.session_id = uuid4().hex
+            self._since_rotation = 0
+            self.rotations += 1
+
+    def _apply_paths(self, probe: Probe) -> None:
+        """Replace structural findings with the operator's own paths.
+
+        Only the paths given are overridden; anything left unset keeps
+        whatever the structural search produced. A path that resolves to
+        nothing leaves the field empty rather than falling back, so a wrong
+        path shows up as a wrong path.
+        """
+        spec = self.paths
+        if not spec.active or not isinstance(probe.body, (dict, list)):
+            return
+
+        if spec.answer_path:
+            value = resolve(probe.body, spec.answer_path)
+            probe.answer = value if isinstance(value, str) else (
+                "" if value is None
+                else json.dumps(value, ensure_ascii=False, default=str))
+            probe.answer_path = tuple(
+                part for part in spec.answer_path.replace("[]", "").split(".")
+                if part)
+
+        if spec.source_path:
+            items = resolve(probe.body, spec.source_path)
+            if not isinstance(items, list):
+                items = []
+            entries = [self._entry_from_paths(item) for item in items]
+            probe.sources = [e for e in entries if e.text or e.title or e.doc_id]
+            probe.source_field = spec.source_path
+
+    def _entry_from_paths(self, item: Any) -> SourceEntry:
+        """Build one passage from an item, path first, key search second."""
+        if isinstance(item, str):
+            return SourceEntry(text=item, title=None, raw=item)
+        if not isinstance(item, dict):
+            return SourceEntry(raw=item)
+
+        spec = self.paths
+
+        def pick(path: str, keys: tuple) -> Any:
+            # Naming the array is usually enough: the fields inside it
+            # mostly carry the names the structural search already knows,
+            # so an unnamed field keeps working.
+            return resolve(item, path) if path else _first(item, keys)
+
+        text = pick(spec.text_path, TEXT_KEYS)
+        title = pick(spec.title_path, TITLE_KEYS)
+        doc_id = pick(spec.doc_id_path, DOCID_KEYS)
+        chunk_id = pick(spec.chunk_id_path, CHUNKID_KEYS)
+        page = pick(spec.page_path, PAGE_KEYS)
+        score = _as_float(pick(spec.score_path, SCORE_KEYS))
+
+        return SourceEntry(
+            text=text if isinstance(text, str) else "",
+            title=str(title) if title is not None else None,
+            doc_id=str(doc_id) if doc_id is not None else None,
+            chunk_id=str(chunk_id) if chunk_id is not None else None,
+            page=page,
+            score=score,
+            raw=item,
+        )
 
     # ----------------------------------------------------------------
     def _charge(self, probe: Probe, request_body: Any) -> None:

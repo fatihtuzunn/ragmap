@@ -48,6 +48,8 @@ $ ragmap -u https://chat.example.com/api/chat -H "Authorization: Bearer ..." --s
 - [Depth: `--level`](#depth---level)
 - [Spend: `--spend`, `--budget`, `--tokens`](#spend---spend---budget---tokens)
 - [When the target refuses](#when-the-target-refuses)
+- [How loud the scan is](#how-loud-the-scan-is)
+- [When structural detection is not enough](#when-structural-detection-is-not-enough)
 - [Flags](#flags)
 - [Output](#output)
 - [How it works](#how-it-works)
@@ -61,6 +63,11 @@ $ ragmap -u https://chat.example.com/api/chat -H "Authorization: Bearer ..." --s
 ## Install
 
 Python 3.10 or newer. The only dependency is `requests`.
+
+One optional extra: `pip install 'ragmap[tokens]'` adds `tiktoken`, which
+makes passage lengths real token counts instead of a four-characters-to-a
+token estimate. Chunkers are configured in tokens, so it is worth having -
+and without it every such figure says `(estimated)`.
 
 ```bash
 python -m venv .venv
@@ -288,6 +295,7 @@ bool(False)` credits a level-gated detector with knowing there is no router.
 -H, --header 'K: V'        extra header (repeatable)
 --auth-bearer TOKEN        shorthand for Authorization: Bearer
 --cookie VALUE             Cookie header
+--proxy URL                send everything through a proxy, e.g. Burp
 --insecure                 do not verify TLS certificates
 
 --spend TIER               peek|quick|standard|deep|max (default standard)
@@ -295,15 +303,24 @@ bool(False)` credits a level-gated detector with knowing there is no router.
 --budget N                 hard request ceiling; overrides the tier
 --tokens N                 hard token ceiling
 --delay SEC                pause between requests (default 0.5)
+--jitter SEC               randomise that pause by +/- this much
 --timeout SEC              per-request timeout (default 90)
 --only / --skip MOD        run or exclude modules, e.g. --only retrieval
 --list-modules             show the module table and exit
+
+--rotate-every N           new session id every N requests (off by default)
+--session-field NAME       body field it goes in (default session_id)
+--opsec-rules FILE         merge extra detection patterns
 
 --topic / --second-topic   supply probe values instead of discovering them
 --absent-topic             a subject known NOT to be in the corpus
 --rare-token               a rare literal known to be in the corpus
 --seed-queries FILE        discovery queries, one per line
 --shape / --query-field    force the request format
+--source-path PATH         where the passages are, e.g. 'results[]'
+--answer-path PATH         where the answer is
+--text-path / --title-path / --chunk-id-path / --doc-id-path
+--score-path / --page-path fields within one source item
 
 -o DIR                     results directory (default ragmap-<timestamp>)
 -oJ FILE / -oN FILE        JSON and text reports at a chosen path
@@ -388,6 +405,43 @@ exactly like a passage list, and treating it as one makes every opaque
 system read as fully transparent. ragmap excludes answer envelopes and
 discards any "passage" that is simply the reply.
 
+### It reads the index, not just the answers
+
+Passages come back with identifiers attached, and those identifiers are
+evidence in their own right. Where chunk ids are sequential within a
+document, the ones a scan has seen bound the ones it has not: having seen
+`policy#c0`, `#c1` and `#c4` proves that document holds at least five
+chunks and that two were never retrieved. That turns a pile of passages
+into a **coverage figure** - how much of this corpus has actually been
+recovered - which no other measurement here produces.
+
+The same pass reports what the identifiers say about the store: whether
+numbering is scoped per document or globally, and whether two documents
+share an id, which means the store cannot tell them apart and a per
+document access rule keyed on that id cannot hold.
+
+Where ids are random - AnythingLLM uses uuids - none of that follows, and
+the scheme is reported as `opaque` with coverage declined. A trailing hex
+digit is not a sequence position, and reading one as a position produced
+"10 seen, >= 710 exist" on a five document corpus before that rule existed.
+
+### It can tell a fixed window from a sentence boundary
+
+Where a passage *stops* says how it was cut. A fixed-width splitter lands
+mid-sentence almost every time; a separator-aware one, like LangChain's
+`RecursiveCharacterTextSplitter`, almost never does. That decides whether
+the configured chunk size is a width that can be reported exactly or a
+ceiling that can only be bounded - and it is corroborating evidence for a
+reading that used to rest on the shape of the length distribution alone.
+
+Only the end of a passage counts. Where one *starts* is set by the overlap
+step: walk back two hundred characters from the last cut and you land
+mid-sentence whatever the splitter prefers. A passage that stops on a
+heading stopped at a boundary too, even with no full stop on the line.
+
+All of this is free. Both detectors read passages other probes already paid
+for and send nothing of their own.
+
 ### It will not guess
 
 Each detector declares what it needs. If the precondition is unmet the
@@ -408,6 +462,70 @@ dressed as a measurement.
 The bracketed `cal 4/4, MAE 0` is not a hand-written label. It is that
 detector's score against the lab, shipped in `ragmap/data/calibration.json`.
 See [Calibration](#calibration).
+
+---
+
+## How loud the scan is
+
+Every scan ends with its own footprint, counted the same way its token
+spend is counted:
+
+```
+[+] opsec
+    footprint         16 of 41 queries flagged: corpus_enumeration x5,
+                      verbatim_extraction x1, topic_sweep x10
+    pacing            0.5s +-0.2s, 11 session id rotations, through a proxy
+```
+
+This is a meter, not a mode. Other tools offer a stealth switch, which is a
+promise; ragmap refuses to make claims it has not measured anywhere else,
+and detection is no exception. Each query the scan sends is matched against
+the patterns a defender's prompt-monitoring rules look for, shipped in
+`ragmap/data/opsec.json` and extensible with `--opsec-rules FILE`.
+
+Two details matter. A rule with a rate threshold only counts once that rate
+is reached, because one "tell me about X" is a user and twenty in a minute
+is a sweep - modelling it otherwise would overstate our own noise. And
+anything the operator supplies with `--topic`, `--rare-token` or
+`--seed-queries` is checked *before* the scan starts and warned about on
+stderr, since by the time it appears in a tally it has already been sent.
+
+The first thing it flags is usually ragmap itself: corpus discovery opens
+with a question about what the system covers, which is exactly what a
+document-enumeration rule is written for.
+
+Pacing and plumbing are controllable:
+
+| Flag | Why |
+|---|---|
+| `--proxy URL` | every request through Burp or ZAP, for watching, replaying one exchange by hand, or showing a client what was actually sent |
+| `--jitter SEC` | a fixed interval is a straight line in a request log; this spreads it around `--delay` without changing the average |
+| `--rotate-every N` | carry a session id in the body and change it every N requests, so one scan is not one conversation in the target's logs. Off by default: inventing a field the target did not ask for can change how it routes the request |
+| `--opsec-rules FILE` | merge your client's own detection patterns with the shipped ones |
+
+---
+
+## When structural detection is not enough
+
+Passages are found by the shape of the response, which is what lets ragmap
+read a product it has never seen. Usually that is right. When it is not,
+every field can be named outright instead of patching the source:
+
+```bash
+ragmap -u https://host/api/chat \
+  --source-path "results[].doc" --text-path content \
+  --score-path relevance --chunk-id-path id \
+  --answer-path "output.text"
+```
+
+The syntax is a dot path with `[]` marking an array to walk into. Naming
+only `--source-path` is normal: the fields inside each item fall back to
+the key names the structural search already knows, so you override what
+differs and nothing else.
+
+An override is the operator stating a fact about the target, so a path that
+resolves to nothing leaves the field empty rather than quietly falling back
+to the structural search. A wrong path should look like a wrong path.
 
 ---
 
@@ -452,17 +570,24 @@ Current scores, conditioned on what each target exposes:
 | `obs.level` | 10/10 | 0 | 0 | - |
 | `routing.cache` | 10/10 | 0 | 0 | - |
 | `generation.determinism` | 10/10 | 0 | 0 | - |
-| `routing.router` | 9/10 | 0 | 0 | - |
+| `routing.router` | 9/10 | 0 | 1 | - |
 | `retrieval.top_k` | 7/7 | 3 | 0 | 0 |
 | `retrieval.threshold` | 7/7 | 3 | 0 | - |
+| `chunk.id_scheme` | 7/7 | 3 | 0 | - |
+| `chunk.collisions` | 7/7 | 3 | 0 | - |
+| `chunk.size` | 7/9 | 1 | 2 | 2.4 |
 | `retrieval.mode` | 5/5 | 5 | 0 | - |
-| `chunk.overlap` | 4/4 | 6 | 0 | 0 |
-| `chunk.size` | 4/9 | 1 | 5 | 0 |
+| `chunk.overlap` | 4/4 | 6 | 0 | 0.3 |
+| `chunk.splitter` | 4/4 | 6 | 0 | - |
 
-Read the last row as the honest result it is: chunk width is measured
-exactly when passages are visible, and recovering it through verbatim
-extraction alone is unreliable. The limitation is published rather than
-hidden behind a confidence label.
+**87 of 90**, against ten targets whose configuration is declared rather
+than guessed.
+
+Read `chunk.size` as the honest result it is: chunk width is measured
+exactly when passages are visible, bounded when they are not, and the two
+profiles it still misses are the ones that both hide passages and refuse to
+quote them. The limitation is published rather than hidden behind a
+confidence label.
 
 `routing.router` scores 9/10 because the lab's in-memory search is too fast
 to produce a latency signal on one profile. That is a limit of the rig, and

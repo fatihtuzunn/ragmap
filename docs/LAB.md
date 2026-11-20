@@ -133,13 +133,29 @@ exactly what a calibration rig must not do.
 | `o1_narrative` | O1 | openai | Sources named only inside the answer prose |
 | `o2_structured` | O2 | openai | Identifiers present, chunk text absent |
 | `o3_full` | O3 | openai | Chunk text + score + identifiers |
-| `anythingllm_like` | O3 | anythingllm | AnythingLLM's shipped defaults: chunk 1000 / overlap 20, no threshold |
+| `anythingllm_like` | O3 | anythingllm | AnythingLLM's shipped defaults: chunk 1000 / overlap 20, no threshold, **and its separator-aware splitter** |
 | `dify_like` | O3 | dify | **A trap**: the source field is named `retriever_resources` |
 | `router_threshold` | O2 | openai | Router + threshold: retrieval never runs for off-corpus queries |
 | `cached_hybrid` | O3 | openai | Semantic cache + hybrid retrieval (catches the rare literal) |
 | `verbose_errors` | O2 | openai | Traceback and a fake framework trace on a bad request |
 
 Adding a profile is a block in `profiles.json`; nothing else needs to change.
+
+### Two splitters
+
+`splitter` picks how documents are cut:
+
+- **`fixed`** (the default) is a character sliding window. Every chunk is
+  exactly `chunk_size` wide and the cuts land mid-sentence.
+- **`recursive`** is what LangChain's `RecursiveCharacterTextSplitter`
+  does, and with it AnythingLLM and most LlamaIndex pipelines: prefer a
+  paragraph break, then a sentence end, and only cut mid-word when nothing
+  else fits. `chunk_size` is a **ceiling** here, not a width.
+
+Both exist because a rig that only ever cuts one way cannot score a
+detector that tells the two apart - a detector hard-coded to answer
+"fixed-width" would be right every time. `anythingllm_like` splits
+recursively, so `chunk.splitter` has something to be wrong about.
 
 Two of these earn their place by being awkward:
 

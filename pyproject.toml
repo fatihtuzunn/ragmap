@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragmap"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reconnaissance scanner for Retrieval-Augmented Generation systems"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,6 +29,10 @@ dependencies = ["requests>=2.31"]
 ragmap = "ragmap.cli:main"
 
 [project.optional-dependencies]
+# Chunkers are configured in tokens, not characters, so counting passages
+# the way the target counts them needs a tokeniser. Optional on purpose:
+# without it those figures are estimated and labelled as estimated.
+tokens = ["tiktoken>=0.7"]
 # The test suite is three plain scripts and needs nothing extra; this is
 # here for the linting most contributors will want.
 dev = ["pyflakes>=3.2"]

@@ -91,6 +91,7 @@
     "_comment": "The AnythingLLM response shape with the defaults it ships: chunk 1000 / overlap 20, no threshold. Source fields must come back POPULATED even for off-topic and nonsense queries.",
     "observability": "O3",
     "response_shape": "anythingllm",
+    "splitter": "recursive",
     "chunk_size": 1000,
     "chunk_overlap": 20,
     "top_k": 4,

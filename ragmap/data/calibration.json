@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-17T17:19:22+00:00",
+  "generated_at": "2026-11-20T16:07:22+00:00",
   "level": 4,
   "facts": {
     "obs.level": {
@@ -55,13 +55,13 @@
     },
     "chunk.size": {
       "overall": {
-        "hits": 4,
+        "hits": 7,
         "total": 9,
-        "silent_failures": 5,
+        "silent_failures": 2,
         "correct_abstentions": 1,
         "not_run": 0,
         "false_positives": 0,
-        "mae": 0.0
+        "mae": 2.429
       },
       "by_observability": {
         "O0": {
@@ -73,13 +73,14 @@
           "total": 1
         },
         "O2": {
-          "hits": 0,
-          "total": 3
+          "hits": 3,
+          "total": 3,
+          "mae": 5.0
         },
         "O3": {
           "hits": 4,
           "total": 4,
-          "mae": 0.0
+          "mae": 0.5
         }
       }
     },
@@ -91,13 +92,13 @@
         "correct_abstentions": 6,
         "not_run": 0,
         "false_positives": 0,
-        "mae": 0.0
+        "mae": 0.25
       },
       "by_observability": {
         "O3": {
           "hits": 4,
           "total": 4,
-          "mae": 0.0
+          "mae": 0.25
         }
       }
     },
@@ -145,7 +146,7 @@
       "overall": {
         "hits": 9,
         "total": 10,
-        "silent_failures": 0,
+        "silent_failures": 1,
         "correct_abstentions": 0,
         "not_run": 0,
         "false_positives": 0
@@ -215,6 +216,62 @@
           "hits": 1,
           "total": 1
         },
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "chunk.splitter": {
+      "overall": {
+        "hits": 4,
+        "total": 4,
+        "silent_failures": 0,
+        "correct_abstentions": 6,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "chunk.id_scheme": {
+      "overall": {
+        "hits": 7,
+        "total": 7,
+        "silent_failures": 0,
+        "correct_abstentions": 3,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
+        "O2": {
+          "hits": 3,
+          "total": 3
+        },
+        "O3": {
+          "hits": 4,
+          "total": 4
+        }
+      }
+    },
+    "chunk.collisions": {
+      "overall": {
+        "hits": 7,
+        "total": 7,
+        "silent_failures": 0,
+        "correct_abstentions": 3,
+        "not_run": 0,
+        "false_positives": 0
+      },
+      "by_observability": {
         "O2": {
           "hits": 3,
           "total": 3

@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import modules as _modules  # noqa: F401  (registers detectors)
+from . import opsec as opsec_mod
 from . import shapes
 from .config import ScanConfig
 from .context import Context
@@ -32,6 +33,10 @@ def scan(config: ScanConfig, *, on_event=None) -> ScanResult:
         timeout=config.timeout, delay=config.delay,
         budget=config.effective_budget(), verify_tls=config.verify_tls,
         raw_dir=raw_dir, token_budget=config.token_budget,
+        proxy=config.proxy, jitter=config.jitter, paths=config.paths,
+        rotate_every=config.rotate_every,
+        session_field=config.session_field,
+        opsec=opsec_mod.load(config.opsec_rules),
     )
     ctx = Context(config, transport)
 

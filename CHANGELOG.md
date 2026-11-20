@@ -1,5 +1,117 @@
 # Changelog
 
+## 0.2.0 - 2026-11-20
+
+Two things this release is about: reading the retrieval index itself
+rather than only the answers it produces, and being honest about how much
+noise the scan makes while doing it.
+
+Until now every passage was treated as a piece of text with a score. It is
+also a numbered position in a document, cut at a particular boundary, in a
+store that may or may not keep its identifiers straight - and all of that
+was arriving on every response and being discarded. Reading it costs no
+requests and says things nothing else here can: how much of a corpus is
+still unseen, whether two documents share an identifier, whether the
+configured chunk size is a width or a ceiling.
+
+The operational side caught up at the same time: a proxy, jittered pacing,
+session rotation, and explicit response paths for the targets structural
+detection reads wrong.
+
+Calibration against the lab went from **66/72 to 87/90**, with three new
+scored detectors and no detector worse than before.
+
+### New: what the index gives away
+
+- `chunking.index` reads the chunk identifier scheme, reports whether
+  numbering is scoped per document or globally, and turns the ids a scan
+  has seen into a **coverage bound** - how many passages the corpus holds
+  at minimum and how many were never retrieved.
+- Identifiers shared by two documents are reported and raise
+  **RAGMAP-011**: the store cannot tell those documents apart.
+- Random identifiers (uuids, hex blobs) are reported as `opaque` and
+  coverage is declined. A trailing hex digit is not a sequence position;
+  before that rule, AnythingLLM's uuids produced "10 seen, >= 710 exist"
+  on a five-document corpus.
+- `chunking.quality` measures passage length **in tokens** as well as
+  characters, with median, p95 and max, and names the smallest embedding
+  window the widest passage still fits. `pip install 'ragmap[tokens]'` for
+  real counts; without it they are estimated and say so.
+- The same detector reports the **splitter family**: a fixed window lands
+  mid-sentence almost every time, a separator-aware one almost never.
+  Only where a passage *ends* is evidence - where it starts is set by the
+  overlap step - and a passage ending on a heading stopped at a boundary
+  too. This is now corroborating evidence for whether `chunk.size` can be
+  reported exactly or only bounded, a decision that used to rest on the
+  shape of the length distribution alone.
+- Passages indexed under more than one document raise **RAGMAP-012**, and
+  encoded payloads in the index raise **RAGMAP-013**.
+- Passages a target names but will not show (observability O2) are now
+  kept. They were discarded for having no text, which blinded every
+  identifier detector exactly where identifiers are the whole disclosure,
+  and starved topic discovery of the document titles it could have used.
+  That single change moved `chunk.size` from 4/9 to 7/9.
+
+### New: how loud the scan is
+
+- Every scan now ends with its own footprint - how many of the queries it
+  sent match the patterns a defender's prompt-monitoring rules look for,
+  by category, counted the way token spend is counted. A meter, not a
+  mode: the first thing it flags is usually ragmap's own corpus discovery.
+- Rate-based rules only count once their own threshold is reached, so one
+  "tell me about X" is a user and twenty in a minute is a sweep.
+- Text the operator supplies with `--topic`, `--rare-token` or
+  `--seed-queries` is checked before the scan starts and warned about on
+  stderr, because a tally arrives too late to help.
+- Patterns ship in `ragmap/data/opsec.json`; `--opsec-rules FILE` merges
+  a client's own. JSON rather than YAML, to keep the dependency count at
+  one.
+
+### New: operating the thing
+
+- `--proxy URL` sends every request through Burp or ZAP.
+- `--jitter SEC` spreads the pace around `--delay` without changing its
+  average, so a scan is not a straight line in a request log.
+- `--rotate-every N` carries a session id in the body and changes it every
+  N requests. Off by default: inventing a field the target did not ask for
+  can change how it routes the request.
+- Supplying all four probe values (`--topic`, `--second-topic`,
+  `--absent-topic`, `--rare-token`) now skips corpus discovery outright
+  instead of running its questions anyway. On the lab that is 42 requests
+  down to 33, with the same eight findings - and the questions it drops
+  are the loudest the scan sends.
+- `--source-path`, `--answer-path`, `--text-path`, `--title-path`,
+  `--chunk-id-path`, `--doc-id-path`, `--score-path` and `--page-path`
+  name response locations outright when structural detection is wrong. A
+  path that resolves to nothing leaves the field empty rather than falling
+  back, so a wrong path looks like a wrong path.
+
+### Fixed
+
+- Chunk identifiers were parsed out of every response and then dropped on
+  the way into the chunk store.
+- A fact label exactly as wide as its column ran into its own value.
+- A detector that runs twice - every free inventory detector does - left
+  two notes saying the same thing with different numbers. Notes can now
+  carry a key and supersede themselves.
+- The scan's results directory holds `ragmap.txt` as well as `ragmap.json`;
+  the live-target walkthrough had been telling readers to open a file that
+  was never written.
+- The calibration report's detector table was one column short of its own
+  header.
+
+### Lab
+
+- `mockrag` gained a second splitter. `fixed` is the old character window;
+  `recursive` cuts on paragraph and sentence boundaries the way LangChain,
+  AnythingLLM and LlamaIndex do, which makes `chunk_size` a ceiling.
+  `anythingllm_like` now uses it, so the splitter detector has something to
+  be wrong about - a rig that only cuts one way would score a hard-coded
+  answer as perfect.
+- Ground truth now declares `splitter`, `chunk_id_scheme` and
+  `chunk_id_collisions`, and the harness scores all three.
+
+
 ## 0.1.0 — 2026-11-17
 
 First packaged release. Everything below has been measured against the

@@ -208,6 +208,19 @@ def run(ctx, budget: int = 40, verbose: bool = False) -> Discovery:
     result.absent_topic = cfg.absent_topic
     result.rare_token = cfg.rare_token
 
+    # With all four supplied there is nothing to discover, and the meta
+    # queries that would run anyway are both the most expensive part of
+    # the scan and the loudest: "what documents do you have access to" is
+    # the first thing a corpus-enumeration rule is written for. Returning
+    # here hands the budget back to the detectors that still need it.
+    if all((result.topic, result.second_topic, result.absent_topic,
+            result.rare_token)):
+        result.notes.append(
+            "Discovery was skipped: topic, second topic, off-corpus topic "
+            "and rare token were all supplied, so no corpus questions were "
+            "put to the target.")
+        return result
+
     # The reserves below used to be fixed numbers - stop confirming topics
     # with ten requests left, stop looking for an absent topic with five.
     # They were sized for a forty-request discovery and starved the only

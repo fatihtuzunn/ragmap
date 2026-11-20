@@ -13,7 +13,9 @@ from . import (          # noqa: F401
     retrieval,
     routing,
     chunking,
+    index,
     generation,
+    opsec,
     errors,
     embedding,
 )

@@ -36,6 +36,8 @@ class Context:
         self._answered: dict[tuple, Probe] = {}
         self.reused = 0
         self.reused_by: dict[str, int] = {}
+        # Notes a detector may rewrite when it runs a second time.
+        self._note_keys: list[tuple[str, str]] = []
 
     # -- module lifecycle ------------------------------------------------
     def begin(self, module: "Module") -> None:
@@ -88,10 +90,11 @@ class Context:
 
     def harvest(self, probe: Probe) -> None:
         for entry in probe.sources:
-            if entry.text:
+            if entry.text or entry.chunk_id or entry.doc_id or entry.title:
                 self.chunks.add(Chunk(
                     text=entry.text, query=probe.query, doc_id=entry.doc_id,
-                    title=entry.title, page=entry.page, score=entry.score))
+                    chunk_id=entry.chunk_id, title=entry.title,
+                    page=entry.page, score=entry.score))
 
     # -- facts -----------------------------------------------------------
     def set_fact(self, key: str, label: str, value: Any = None, *,
@@ -135,8 +138,27 @@ class Context:
             return
         self.findings.append(finding)
 
-    def note(self, text: str) -> None:
-        if text and text not in self.notes:
+    def note(self, text: str, *, key: str | None = None) -> None:
+        """Add a note, or replace the one this detector left earlier.
+
+        A detector that runs twice - the free inventory ones all do, once
+        in dependency order and once over the finished scan - would
+        otherwise leave two notes that say the same thing with different
+        numbers, and a reader has no way to tell which is current. A `key`
+        makes the second note supersede the first.
+        """
+        if not text:
+            return
+        if key is not None:
+            for index, (existing_key, _) in enumerate(self._note_keys):
+                if existing_key == key:
+                    stale = self._note_keys[index][1]
+                    if stale in self.notes:
+                        self.notes[self.notes.index(stale)] = text
+                    self._note_keys[index] = (key, text)
+                    return
+            self._note_keys.append((key, text))
+        if text not in self.notes:
             self.notes.append(text)
 
 
