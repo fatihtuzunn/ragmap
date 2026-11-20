@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .. import confidence
+from .. import atlas, confidence
 from ..model import ScanResult
 
 
@@ -57,6 +57,7 @@ def to_dict(result: ScanResult) -> dict:
                 "detail": f.detail,
                 "evidence": f.evidence,
                 "facts": f.facts,
+                "atlas": [{"id": t, "name": atlas.name(t)} for t in f.atlas],
             }
             for f in result.sorted_findings()
         ],

@@ -145,4 +145,19 @@ assert "observability.level" not in resettled, \
     "a graded judgement must not be re-run over error-probe replies"
 assert resettled, "nothing is re-run; the inventory facts will be stale"
 
+print("case 10: every ATLAS technique cited is one that exists")
+from ragmap import atlas, findings                     # noqa: E402
+cited = {t for _, _, _, techniques in findings.CATALOG.values()
+         for t in techniques}
+unknown = atlas.unknown(cited)
+print("   techniques cited:", len(cited), "| release:", atlas.VERSION)
+# A technique id invented or copied from a stale catalogue would be
+# published in a client report, where nobody can tell it is wrong. The
+# mapping may only name ids verified against the release above.
+assert not unknown, f"not in the verified table: {unknown}"
+assert cited, "the ATLAS mapping is empty"
+for finding_id, (_t, _s, _d, techniques) in findings.CATALOG.items():
+    assert len(set(techniques)) == len(techniques), \
+        f"{finding_id} cites the same technique twice"
+
 print("all plan and cache cases pass")

@@ -88,6 +88,9 @@ class Finding:
     detail: str = ""
     evidence: str = ""
     facts: list[str] = field(default_factory=list)
+    # MITRE ATLAS techniques this exposure makes available. Read one way
+    # only: the technique is reachable, not that anyone has used it.
+    atlas: list[str] = field(default_factory=list)
 
 
 @dataclass

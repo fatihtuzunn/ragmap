@@ -54,6 +54,7 @@ $ ragmap -u https://chat.example.com/api/chat -H "Authorization: Bearer ..." --s
 - [Flags](#flags)
 - [Output](#output)
 - [How it works](#how-it-works)
+- [MITRE ATLAS](#mitre-atlas)
 - [Observability levels](#observability-levels)
 - [Calibration](#calibration)
 - [Writing a detector](#writing-a-detector)
@@ -571,6 +572,38 @@ differs and nothing else.
 An override is the operator stating a fact about the target, so a path that
 resolves to nothing leaves the field empty rather than quietly falling back
 to the structural search. A wrong path should look like a wrong path.
+
+---
+
+## MITRE ATLAS
+
+Findings carry the ATLAS techniques they make available:
+
+```
+    RAGMAP-014  high    Vector store reachable without authentication
+                         Chroma is reachable at 10.0.4.12:8000 without credentials
+                         ATLAS  AML.T0085.000 RAG Databases, AML.T0070 RAG Poisoning,
+                                AML.T0025 Exfiltration via Cyber Means
+```
+
+Read the mapping in one direction only. An ATLAS technique describes what
+an **adversary does**; a ragmap finding describes what a **system
+exposes**. "RAGMAP-005 enables AML.T0064" is a claim about what is now
+reachable, not an allegation that anyone has done it.
+
+Several findings carry no technique, and that is deliberate. A chunk
+identifier collision is worth fixing, but no ATLAS technique describes
+exploiting one, and filling the column with the nearest-looking id would
+make every other row less trustworthy.
+
+Every id and name is taken from the current ATLAS release, named in
+`ragmap/atlas.py` and printed by the test that guards it. That check
+exists because the catalogue moves: ATLAS renamed "ML" to "AI" across all
+its techniques, and ids that earlier releases carried no longer exist. A
+wrong technique id in a client report is worse than an empty column,
+because the reader has no way to tell it is wrong, so the mapping may only
+cite ids verified against that release and `tests/test_plan.py` fails if
+it ever cites one that is not.
 
 ---
 

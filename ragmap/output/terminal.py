@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 
+from .. import atlas
 from ..model import Fact, ScanResult
 
 SECTIONS = [
@@ -169,6 +170,10 @@ def _render_findings(p: Printer, result: ScanResult) -> None:
                            SEVERITY_COLOR.get(finding.severity, "37"))
         p.line(f"    {finding.id}  {severity} {finding.title}")
         p.line(f"                         {finding.summary}")
+        if finding.atlas:
+            techniques = ", ".join(atlas.label(t) for t in finding.atlas)
+            p.line(p.paint(f"                         ATLAS  {techniques}",
+                           "90"))
     p.line()
 
 

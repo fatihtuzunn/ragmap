@@ -52,6 +52,21 @@ scored detectors and no detector worse than before.
   and starved topic discovery of the document titles it could have used.
   That single change moved `chunk.size` from 4/9 to 7/9.
 
+### New: MITRE ATLAS references
+
+- Findings now carry the ATLAS techniques they make available, in the
+  terminal report and in the JSON (id and name both).
+- The mapping reads one way: a technique is what an adversary does, a
+  finding is what a system exposes, so the claim is reachability and not
+  attribution. Findings with no matching technique carry none rather than
+  the nearest-looking id.
+- Ids are taken from a single verified release, named in
+  `ragmap/atlas.py`, and `tests/test_plan.py` fails if the catalogue ever
+  cites one that is not in it. Worth the guard: ATLAS renamed "ML" to
+  "AI" across its techniques, and two ids that earlier releases carried -
+  including the whole membership-inference sub-tree under T0024 - no
+  longer exist.
+
 ### New: the store behind the endpoint
 
 - `store.exposed` looks for the vector database the chat endpoint is
