@@ -10,6 +10,7 @@ SECTIONS = [
     ("interface", "interface"),
     ("retrieval", "retrieval"),
     ("corpus", "corpus"),
+    ("store", "vector store"),
     ("generation", "generation"),
     # Last on purpose: it describes the scan, not the target, and a reader
     # should reach the target's facts first.

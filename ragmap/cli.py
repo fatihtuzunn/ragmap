@@ -70,6 +70,11 @@ def build_parser() -> argparse.ArgumentParser:
     target.add_argument("--proxy", metavar="URL",
                         help="send every request through this proxy, "
                              "e.g. http://127.0.0.1:8080")
+    target.add_argument("--vector-store", metavar="URL",
+                        help="address of the vector database, when it is "
+                             "not on the target's own host. Without this "
+                             "ragmap tries the default ports of the host "
+                             "already given; --skip store turns that off")
     target.add_argument("--model", default="ragmap",
                         help="model name to send in OpenAI-shaped bodies")
 
@@ -213,6 +218,7 @@ def config_from_args(args) -> ScanConfig:
         skip={s.strip() for s in args.skip.split(",") if s.strip()},
         shape=args.shape,
         query_field=args.query_field,
+        vector_store=args.vector_store,
         paths=PathSpec(
             source_path=args.source_path, answer_path=args.answer_path,
             text_path=args.text_path, title_path=args.title_path,

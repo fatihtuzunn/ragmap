@@ -10,6 +10,7 @@ from . import (          # noqa: F401
     observability,
     presence,
     corpus,
+    store,
     retrieval,
     routing,
     chunking,

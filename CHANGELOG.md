@@ -52,6 +52,24 @@ scored detectors and no detector worse than before.
   and starved topic discovery of the document titles it could have used.
   That single change moved `chunk.size` from 4/9 to 7/9.
 
+### New: the store behind the endpoint
+
+- `store.exposed` looks for the vector database the chat endpoint is
+  talking to, on the host the operator already named. Chroma, Qdrant,
+  Weaviate, Milvus, Elasticsearch and Marqo are recognised by their own
+  default endpoints, and a reply must carry the product's own marker to
+  count - a status page on port 8000 is not a database.
+- A store that answers anonymously raises **RAGMAP-014**, high. It is the
+  one finding that outranks everything else in the report: no amount of
+  withheld passages, hidden scores or similarity thresholds matters while
+  the corpus can be listed and downloaded straight from the store.
+- A store that refuses anonymous access is reported as present and
+  authenticated, and raises nothing. Reachable is not exposed.
+- The probe stays on one host, never scans a range, and counts
+  collections without ever retrieving a document. The count is the
+  finding; the contents belong to the client.
+- `--vector-store URL` points it elsewhere; `--skip store` turns it off.
+
 ### New: how loud the scan is
 
 - Every scan now ends with its own footprint - how many of the queries it

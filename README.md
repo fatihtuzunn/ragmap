@@ -48,6 +48,7 @@ $ ragmap -u https://chat.example.com/api/chat -H "Authorization: Bearer ..." --s
 - [Depth: `--level`](#depth---level)
 - [Spend: `--spend`, `--budget`, `--tokens`](#spend---spend---budget---tokens)
 - [When the target refuses](#when-the-target-refuses)
+- [The store behind the endpoint](#the-store-behind-the-endpoint)
 - [How loud the scan is](#how-loud-the-scan-is)
 - [When structural detection is not enough](#when-structural-detection-is-not-enough)
 - [Flags](#flags)
@@ -214,11 +215,11 @@ level 4 on thirty requests produces a report full of `skipped (budget)`.
 
 | Tier | Level | Ceiling | Requests used | Facts | Buys |
 |---|---|---|---|---|---|
-| `peek` | 1 | 12 | 4 | 11 | is it a RAG, and what shows from outside |
-| `quick` | 2 | 35 | 32 | 22 | + corpus topics, top-k, threshold |
-| `standard` *(default)* | 3 | 90 | 42 | 27 | + chunk size, mode, verbatim leak |
-| `deep` | 4 | 220 | 42 | 29 | + chunk overlap, reranker |
-| `max` | 5 | 700 | 45 | 30 | everything |
+| `peek` | 1 | 12 | 4 | 14 | is it a RAG, and what shows from outside |
+| `quick` | 2 | 35 | 28 | 28 | + the vector store, corpus topics, top-k, threshold |
+| `standard` *(default)* | 3 | 90 | 44 | 37 | + chunk size, mode, verbatim leak |
+| `deep` | 4 | 220 | 44 | 39 | + chunk overlap, reranker |
+| `max` | 5 | 700 | 47 | 40 | everything |
 
 
 
@@ -296,6 +297,8 @@ bool(False)` credits a level-gated detector with knowing there is no router.
 --auth-bearer TOKEN        shorthand for Authorization: Bearer
 --cookie VALUE             Cookie header
 --proxy URL                send everything through a proxy, e.g. Burp
+--vector-store URL         where the vector database is, if not on the
+                           target's own host (--skip store disables)
 --insecure                 do not verify TLS certificates
 
 --spend TIER               peek|quick|standard|deep|max (default standard)
@@ -462,6 +465,48 @@ dressed as a measurement.
 The bracketed `cal 4/4, MAE 0` is not a hand-written label. It is that
 detector's score against the lab, shipped in `ragmap/data/calibration.json`.
 See [Calibration](#calibration).
+
+---
+
+## The store behind the endpoint
+
+Everything else here measures what a RAG system chooses to reveal through
+its chat API. That has a blind spot, and it is a large one: the chat
+endpoint is not the only way into the corpus. The vector database behind
+it listens on its own port, speaks its own REST API, and in a default
+deployment it has no authentication at all, because the quickstart that
+put it there assumed it would never be reachable.
+
+```
+[+] vector store
+    vector store      Chroma at 10.0.4.12:8000    [HTTP 200 from .../api/v2/heartbeat]
+    store auth        NONE                        [the store answered an anonymous request]
+    store contents    3 collection(s) listed      [company_docs, hr_policies, engineering_wiki]
+
+[!] findings
+    RAGMAP-014  high    Vector store reachable without authentication
+```
+
+When that finding appears, the rest of the report stops mattering. It
+does not matter that passages are withheld, that a threshold cuts
+off-topic queries, or that scores are hidden, if the same corpus can be
+listed and downloaded straight from port 8000 by anyone who asks.
+
+Chroma, Qdrant, Weaviate, Milvus, Elasticsearch and Marqo are recognised
+by their own default endpoints. Identification needs the product's own
+marker in the reply, not just a 200, so a status page on the same port is
+not reported as a database - `tests/test_store.py` holds that case.
+
+**What it will not do.** It stays on the host the operator already named:
+no range, no other hosts, no following a redirect somewhere else. It reads
+identity and counts - what product, how many collections - and never
+retrieves documents, even when the store would hand them over. The count
+is the finding; the contents are the client's.
+
+`--vector-store URL` points it at another address, for a deployment that
+keeps its store on a different machine. `--skip store` turns it off, which
+is the right call when the engagement covers one URL and nothing else on
+the host.
 
 ---
 

@@ -67,6 +67,7 @@ class ScanConfig:
     # Manual overrides that let an operator skip detection entirely.
     shape: str | None = None
     query_field: str | None = None
+    vector_store: str | None = None
     paths: PathSpec = field(default_factory=PathSpec)
     topic: str | None = None
     second_topic: str | None = None

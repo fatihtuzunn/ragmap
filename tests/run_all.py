@@ -14,6 +14,10 @@ live scan cannot check for you:
     test_retry.py      the rate-limit paths - a per-minute limit must widen
                        pacing and a daily allowance must stop the scan,
                        and neither path runs unless a target refuses
+    test_store.py      the vector-store detector - that a status page is
+                       not reported as a database, that a store behind
+                       credentials is not reported as open, and that the
+                       detector counts collections without reading them
     check_geometry.py  the chunk-size and overlap detectors, replayed
                        against the recorded AnythingLLM scan whose true
                        geometry (900 / 150) is known
@@ -27,7 +31,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 
-SCRIPTS = ["test_plan.py", "test_retry.py", "check_geometry.py"]
+SCRIPTS = ["test_plan.py", "test_retry.py", "test_store.py",
+           "check_geometry.py"]
 
 
 def main() -> int:

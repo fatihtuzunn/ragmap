@@ -60,6 +60,13 @@ CATALOG: dict[str, tuple[str, str, str]] = {
         "The same text is stored several times, so one topic can fill the "
         "whole top-k with copies of itself and crowd out the rest of the "
         "corpus."),
+    "RAGMAP-014": (
+        "Vector store reachable without authentication", "high",
+        "The vector database behind the chat endpoint answers anonymous "
+        "requests on its own port. The corpus can be listed, read and "
+        "written directly, which makes every restriction the chat API "
+        "enforces - hidden passages, similarity thresholds, withheld "
+        "scores - irrelevant to anyone who goes around it."),
     "RAGMAP-013": (
         "Encoded data in the retrieval index", "medium",
         "Passages that are base64 or similar encoded payloads rather than "

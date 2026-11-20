@@ -684,6 +684,60 @@ class Transport:
         if wait > 0:
             time.sleep(wait)
 
+    def fetch(self, url: str, *, timeout: float = 4.0,
+              label: str = "") -> Probe:
+        """GET a URL that is not the chat endpoint.
+
+        The retrieval layer is not only reachable through the chat API. A
+        vector store sitting behind it answers on its own port, and if it
+        answers without credentials then everything the chat endpoint
+        carefully withholds is available directly. Finding that out needs a
+        plain GET rather than a chat body, but it is still a request
+        against the operator's budget and the client's infrastructure, so
+        it is counted, paced and recorded like any other.
+
+        The timeout is short by default. A closed port on a public host
+        hangs rather than refusing, and a handful of those at the scan
+        timeout would cost more wall-clock than the entire rest of the
+        scan.
+        """
+        if self.exhausted:
+            raise BudgetExhausted(
+                f"the target's own allowance is spent: {self.exhausted[:120]}")
+        if self.budget and self.used >= self.budget:
+            raise BudgetExhausted(f"request budget of {self.budget} is spent")
+
+        probe = Probe(query=label or f"GET {url}", url=url, index=self.used)
+        start = time.perf_counter()
+        try:
+            response = self.session.get(url, headers=self.headers,
+                                        timeout=timeout,
+                                        verify=self.verify_tls,
+                                        allow_redirects=False)
+        except requests.RequestException as exc:
+            probe.error = f"{type(exc).__name__}: {exc}"
+            probe.latency_ms = (time.perf_counter() - start) * 1000
+            self.used += 1
+            self._record(probe, None)
+            return probe
+
+        probe.latency_ms = (time.perf_counter() - start) * 1000
+        probe.status = response.status_code
+        probe.headers = dict(response.headers)
+        # A vector store's listing can be enormous and it is not ours to
+        # take. The identification needs the shape of the reply, not its
+        # contents, so only the head of the body is kept.
+        probe.raw_text = response.text[:4000]
+        try:
+            probe.body = response.json()
+        except ValueError:
+            probe.body = probe.raw_text
+
+        self.used += 1
+        self._record(probe, None)
+        self._pause()
+        return probe
+
     def _stamp_session(self, body: Any) -> None:
         """Carry a session id in the body, rotating it every N requests.
 
